@@ -13,12 +13,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Status {
+  ACTIVO
+  INACTIVO
+}
+
 model Proveedor {
   id       String  @id @default(uuid())
   nombre   String  @db.VarChar(100)
   telefono String  @db.VarChar(20)
   correo   String  @db.VarChar(50)
-  estado   Boolean
+  estado   Status  @default(ACTIVO)
   lotes    Lote[]
 }
 
@@ -27,7 +32,7 @@ model Lote {
   productoId        String
   proveedorId       String
   fechaVencimiento  DateTime
-  estado            Boolean
+  estado   Status  @default(ACTIVO)
 
   producto          Producto @relation(fields: [productoId], references: [id])
   proveedor        Proveedor @relation(fields: [proveedorId], references: [id])
@@ -36,7 +41,7 @@ model Lote {
 model Categoria {
   id      String    @id @default(uuid())
   nombre  String    @db.VarChar(50)
-  estado  Boolean
+  estado   Status  @default(ACTIVO)
   productos Producto[]
 }
 
@@ -44,6 +49,7 @@ model Producto {
   id          String    @id @default(uuid())
   nombre      String    @db.VarChar(100)
   precio      Decimal
+  estado   Status  @default(ACTIVO)
   categoriaId String
 
   categoria   Categoria @relation(fields: [categoriaId], references: [id])
@@ -70,7 +76,7 @@ model Usuario {
   nombre    String  @db.VarChar(50)
   correo    String  @db.VarChar(50)
   clave     String  @db.VarChar(100)
-  estado    Boolean
+  estado   Status  @default(ACTIVO)
   esAdmin   Boolean
   esVendedor Boolean
 }
