@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateSupplierDto } from './dto/create.supplier';
 import { UpdateSupplierDto } from './dto/update.supplier';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class SupplierService {
