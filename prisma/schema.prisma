@@ -13,13 +13,97 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
 model User {
-  id    String  @id
-  name    String  @db.VarChar(50)
-  email    String  @unique @db.VarChar(50)
-  password     String?  @db.VarChar(150)
-  birthdate    DateTime
-  isActive    Boolean @default(false)
-  isAdmin   Boolean @default(false)
-  isEmployee Boolean @default(false)
+  id         String   @id
+  name       String   @db.VarChar(50)
+  email      String   @unique @db.VarChar(50)
+  password   String?  @db.VarChar(150)
+  birthdate  DateTime
+  status     Status   @default(INACTIVE)
+  isAdmin    Boolean  @default(false)
+  isEmployee Boolean  @default(false)
+}
+
+model Client {
+  id    String              @id
+  name  String              @db.VarChar(50)
+  email String              @db.VarChar(50)
+  sales SaleProductClient[]
+}
+
+model Supplier {
+  id      String  @id @default(uuid())
+  name    String  @db.VarChar(100)
+  phone   String  @db.VarChar(20)
+  email   String  @db.VarChar(50)
+  status  Status  @default(INACTIVE)
+  batches Batch[]
+}
+
+model Batch {
+  id             String   @id @default(uuid())
+  productId      String
+  supplierId     String
+  expirationDate DateTime
+  status         Status   @default(ACTIVE)
+
+  product  Product  @relation(fields: [productId], references: [id])
+  supplier Supplier @relation(fields: [supplierId], references: [id])
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String    @db.VarChar(50)
+  status   Status    @default(INACTIVE)
+  products Product[]
+}
+
+model Product {
+  id         String  @id @default(uuid())
+  name       String  @db.VarChar(100)
+  price      Decimal
+  status     Status  @default(INACTIVE)
+  categoryId String
+
+  category Category            @relation(fields: [categoryId], references: [id])
+  batches  Batch[]
+  sales    SaleProductClient[]
+  snack    Snack?
+  medicine Medicine?
+}
+
+model Snack {
+  id      String  @id @default(uuid())
+  product Product @relation(fields: [id], references: [id])
+}
+
+model Medicine {
+  id      String  @id @default(uuid())
+  dose    Decimal
+  product Product @relation(fields: [id], references: [id])
+}
+
+model Sale {
+  id       String              @id @default(uuid())
+  total    Decimal             @db.Decimal(10, 0)
+  date     DateTime
+  repaid   Boolean
+  products SaleProductClient[]
+}
+
+model SaleProductClient {
+  id        String @id @default(uuid())
+  productId String
+  saleId    String
+  clientId  String
+  amount    Int
+
+  producto Product @relation(fields: [productId], references: [id])
+  venta    Sale    @relation(fields: [saleId], references: [id])
+  cliente  Client  @relation(fields: [clientId], references: [id])
 }

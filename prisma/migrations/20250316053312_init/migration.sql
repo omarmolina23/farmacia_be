@@ -1,10 +1,13 @@
+-- CreateEnum
+CREATE TYPE "Status" AS ENUM ('ACTIVO', 'INACTIVO');
+
 -- CreateTable
 CREATE TABLE "Proveedor" (
     "id" TEXT NOT NULL,
     "nombre" VARCHAR(100) NOT NULL,
     "telefono" VARCHAR(20) NOT NULL,
     "correo" VARCHAR(50) NOT NULL,
-    "estado" BOOLEAN NOT NULL,
+    "estado" "Status" NOT NULL DEFAULT 'ACTIVO',
 
     CONSTRAINT "Proveedor_pkey" PRIMARY KEY ("id")
 );
@@ -15,7 +18,7 @@ CREATE TABLE "Lote" (
     "productoId" TEXT NOT NULL,
     "proveedorId" TEXT NOT NULL,
     "fechaVencimiento" TIMESTAMP(3) NOT NULL,
-    "estado" BOOLEAN NOT NULL,
+    "estado" "Status" NOT NULL DEFAULT 'ACTIVO',
 
     CONSTRAINT "Lote_pkey" PRIMARY KEY ("numero")
 );
@@ -24,7 +27,7 @@ CREATE TABLE "Lote" (
 CREATE TABLE "Categoria" (
     "id" TEXT NOT NULL,
     "nombre" VARCHAR(50) NOT NULL,
-    "estado" BOOLEAN NOT NULL,
+    "estado" "Status" NOT NULL DEFAULT 'ACTIVO',
 
     CONSTRAINT "Categoria_pkey" PRIMARY KEY ("id")
 );
@@ -34,6 +37,7 @@ CREATE TABLE "Producto" (
     "id" TEXT NOT NULL,
     "nombre" VARCHAR(100) NOT NULL,
     "precio" DECIMAL(65,30) NOT NULL,
+    "estado" "Status" NOT NULL DEFAULT 'ACTIVO',
     "categoriaId" TEXT NOT NULL,
 
     CONSTRAINT "Producto_pkey" PRIMARY KEY ("id")
@@ -61,7 +65,7 @@ CREATE TABLE "Usuario" (
     "nombre" VARCHAR(50) NOT NULL,
     "correo" VARCHAR(50) NOT NULL,
     "clave" VARCHAR(100) NOT NULL,
-    "estado" BOOLEAN NOT NULL,
+    "estado" "Status" NOT NULL DEFAULT 'ACTIVO',
     "esAdmin" BOOLEAN NOT NULL,
     "esVendedor" BOOLEAN NOT NULL,
 
@@ -97,6 +101,23 @@ CREATE TABLE "VentaProductoCliente" (
 
     CONSTRAINT "VentaProductoCliente_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "name" VARCHAR(50) NOT NULL,
+    "email" VARCHAR(50) NOT NULL,
+    "password" VARCHAR(150),
+    "birthdate" TIMESTAMP(3) NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT false,
+    "isAdmin" BOOLEAN NOT NULL DEFAULT false,
+    "isEmployee" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- AddForeignKey
 ALTER TABLE "Lote" ADD CONSTRAINT "Lote_productoId_fkey" FOREIGN KEY ("productoId") REFERENCES "Producto"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
