@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "password" DROP NOT NULL,
+ALTER COLUMN "password" SET DATA TYPE VARCHAR(150),
+ALTER COLUMN "isActive" SET DEFAULT false,
+ALTER COLUMN "isAdmin" SET DEFAULT false,
+ALTER COLUMN "isEmployee" SET DEFAULT false;

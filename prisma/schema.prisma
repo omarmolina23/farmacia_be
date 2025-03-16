@@ -13,91 +13,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Proveedor {
-  id       String  @id @default(uuid())
-  nombre   String  @db.VarChar(100)
-  telefono String  @db.VarChar(20)
-  correo   String  @db.VarChar(50)
-  estado   Boolean
-  lotes    Lote[]
-}
-
-model Lote {
-  numero            String   @id @default(uuid())
-  productoId        String
-  proveedorId       String
-  fechaVencimiento  DateTime
-  estado            Boolean
-
-  producto          Producto @relation(fields: [productoId], references: [id])
-  proveedor        Proveedor @relation(fields: [proveedorId], references: [id])
-}
-
-model Categoria {
-  id      String    @id @default(uuid())
-  nombre  String    @db.VarChar(50)
-  estado  Boolean
-  productos Producto[]
-}
-
-model Producto {
-  id          String    @id @default(uuid())
-  nombre      String    @db.VarChar(100)
-  precio      Decimal
-  categoriaId String
-
-  categoria   Categoria @relation(fields: [categoriaId], references: [id])
-  lotes       Lote[]
-  ventas      VentaProductoCliente[]
-  snack       Snack?
-  medicamento Medicamento?
-}
-
-model Snack {
-  id               String  @id @default(uuid())
-  fechaVencimiento DateTime
-  producto         Producto @relation(fields: [id], references: [id])
-}
-
-model Medicamento {
-  id      String  @id @default(uuid())
-  dosis   Decimal
-  producto Producto @relation(fields: [id], references: [id])
-}
-
-model Usuario {
-  cedula    String  @id
-  nombre    String  @db.VarChar(50)
-  correo    String  @db.VarChar(50)
-  clave     String  @db.VarChar(100)
-  estado    Boolean
-  esAdmin   Boolean
-  esVendedor Boolean
-}
-
-model Cliente {
-  cedula   String  @id
-  nombre   String  @db.VarChar(50)
-  correo   String  @db.VarChar(50)
-  ventas   VentaProductoCliente[]
-}
-
-model Venta {
-  id       String   @id @default(uuid())
-  total    Decimal  @db.Decimal(10, 0)
-  fecha    DateTime
-  devuelto Boolean
-  productos VentaProductoCliente[]
-}
-
-model VentaProductoCliente {
-  id         String  @id @default(uuid())
-  productoId String
-  ventaId    String
-  clienteId  String
-  cantidad   Int
-
-  producto   Producto @relation(fields: [productoId], references: [id])
-  venta      Venta    @relation(fields: [ventaId], references: [id])
-  cliente    Cliente  @relation(fields: [clienteId], references: [cedula])
+model User {
+  id    String  @id
+  name    String  @db.VarChar(50)
+  email    String  @unique @db.VarChar(50)
+  password     String?  @db.VarChar(150)
+  birthdate    DateTime
+  isActive    Boolean @default(false)
+  isAdmin   Boolean @default(false)
+  isEmployee Boolean @default(false)
 }
