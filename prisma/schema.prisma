@@ -19,14 +19,16 @@ enum Status {
 }
 
 model User {
-  id         String   @id
-  name       String   @db.VarChar(50)
-  email      String   @unique @db.VarChar(50)
-  password   String?  @db.VarChar(150)
-  birthdate  DateTime
-  status     Status   @default(INACTIVE)
-  isAdmin    Boolean  @default(false)
-  isEmployee Boolean  @default(false)
+  id               String   @id
+  name             String   @db.VarChar(50)
+  phone            String   @db.VarChar(20)
+  email            String   @unique @db.VarChar(50)
+  password         String?  @db.VarChar(150)
+  birthdate        DateTime
+  registrationDate DateTime @default(now())
+  status           Status   @default(INACTIVE)
+  isAdmin          Boolean  @default(false)
+  isEmployee       Boolean  @default(false)
 }
 
 model Client {

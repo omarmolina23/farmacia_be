@@ -19,7 +19,6 @@ export class AuthController {
         @Query('token') token: string,
         @Body() setPasswordUserDto: SetPasswordUserDto
     ){
-        console.log(token);
         return this.authService.setPassword(token, setPasswordUserDto);
     }
 }
