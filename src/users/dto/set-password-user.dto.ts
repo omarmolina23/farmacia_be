@@ -5,7 +5,6 @@ export class SetPasswordUserDto {
     @IsNotEmpty()
     @IsString()
     @IsStrongPassword()
-    
     password: string;
 
 }

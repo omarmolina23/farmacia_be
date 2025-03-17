@@ -28,7 +28,7 @@ model User {
   registrationDate DateTime @default(now())
   status           Status   @default(INACTIVE)
   isAdmin          Boolean  @default(false)
-  isEmployee       Boolean  @default(false)
+  isEmployee       Boolean  @default(true)
 }
 
 model Client {

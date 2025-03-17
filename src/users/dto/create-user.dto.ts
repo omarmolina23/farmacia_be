@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsDate, IsBoolean, IsStrongPassword, IsEnum, IsOptional } from "class-validator";
+import { IsNotEmpty, IsString, IsDate, IsBoolean, IsEmail, IsStrongPassword, IsEnum, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
 
 export enum Status {
@@ -21,7 +21,7 @@ export class CreateUserDto {
     phone: string;
 
     @IsNotEmpty()
-    @IsString()
+    @IsEmail()
     email: string;
 
     @IsOptional()
