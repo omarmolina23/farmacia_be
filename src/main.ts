@@ -17,7 +17,7 @@ async function bootstrap() {
     secret: process.env.SECRET, // for cookies signature
   });
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({whitelist: true}));
   app.setGlobalPrefix('api');
   await app.listen(process.env.PORT ?? 3000);
 }

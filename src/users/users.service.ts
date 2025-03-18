@@ -2,6 +2,7 @@ import { Injectable, Body, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -42,33 +43,50 @@ export class UsersService {
     }
   }
 
+  async findOneByNameOrId(query?: string) {
+    if (!query) {
+        return await this.prisma.user.findMany();
+    }
+
+    return await this.prisma.user.findMany({
+        where: {
+            OR: [
+                { name: { contains: query, mode: 'insensitive' } },
+                { id: query },
+            ],
+        },
+    });
+}
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
-      const user = this.prisma.user.findUnique({
+
+      console.log("id", id);
+      const user = await this.prisma.user.findUnique({
         where: { id },
       });
 
+      console.log("user", user);
 
-      if(!user) {
+      if (!user) {
         throw new NotFoundException('User not found');
       }
 
-      return this.prisma.user.update({
+      return await this.prisma.user.update({
         where: { id },
         data: updateUserDto,
       });
     } catch (error) {
+      console.log("error", error);
       throw error;
     }
-
   }
 
   async remove(id: string) {
-    const user = this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id },
     });
 
-    return this.prisma.user.update({
+    return await this.prisma.user.update({
       where: { id },
       data: { status: 'INACTIVE' },
     })

@@ -1,9 +1,12 @@
-import { Body, Res, Query, Controller, Post } from '@nestjs/common';
+import { Body, Res, Query, Controller, Post, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { LoginUserDto } from 'src/users/dto/login-user.dto';
 import { SetPasswordUserDto } from 'src/users/dto/set-password-user.dto';
 import { ForgotPasswordDto } from 'src/users/dto/forgot-password.dto';
 import { AuthService } from './auth.service';
-import { LoginUserDto } from 'src/users/dto/login-user.dto';
+import { AuthGuard } from './guard/auth.guard';
+import { RolesGuard } from './guard/roles.guard';
+import { Roles } from './guard/roles.decorator';
 import { FastifyReply } from 'fastify';
 
 
@@ -27,11 +30,12 @@ export class AuthController {
 
     @Post('sign-out')
     signOut(
-        @Res() response : FastifyReply
+        @Res() response: FastifyReply
     ) {
         return this.authService.signOut(response);
     }
 
+    @UseGuards(AuthGuard, RolesGuard)
     @Post('set-password')
     setPassword(
         @Query('token') token: string,

@@ -41,15 +41,15 @@ export class AuthService {
                 throw new UnauthorizedException('Invalid credentials');
             }
 
-            const token = this.jwtService.sign({ id: user.id, sub: user.email }, { expiresIn: '1h' });
+            const token = this.jwtService.sign({ id: user.id, isAdmin: user.isAdmin, isEmployee: user.isEmployee, sub: user.email }, { expiresIn: '1h' });
             const refreshToken = this.jwtService.sign({ id: user.id, sub: user.email }, { expiresIn: '1d' });
 
 
             response.setCookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', 
+                secure: process.env.NODE_ENV === 'production',
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                maxAge: 60 * 60 * 24, 
+                maxAge: 60 * 60 * 24,
                 path: '/',
             });
 
@@ -199,7 +199,7 @@ export class AuthService {
                 throw new NotFoundException('User not found');
             }
 
-            const tokenSession = this.jwtService.sign({ id: user.id, sub: user.email }, { expiresIn: '1h' });
+            const tokenSession = this.jwtService.sign({ id: user.id, isAdmin: user.isAdmin, isEmployee: user.isEmployee, sub: user.email }, { expiresIn: '1h' });
 
             return {
                 token: tokenSession,
