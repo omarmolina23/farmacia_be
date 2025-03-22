@@ -9,13 +9,13 @@ describe('CategoryService', () => {
   let prismaService: PrismaService;
 
   const mockPrismaService = {
-    categoria: {
+    category: {
       create: jest.fn((dto) => Promise.resolve({ id: '1', ...dto.data })),
       findMany: jest.fn(() => Promise.resolve([
-        { id: '1', nombre: 'Category 1' },
-        { id: '2', nombre: 'Category 2' },
+        { id: '1', name: 'Category 1' },
+        { id: '2', name: 'Category 2' },
       ])),
-      findUnique: jest.fn(({ where }) => Promise.resolve({ id: where.id, nombre: `Category ${where.id}` })),
+      findUnique: jest.fn(({ where }) => Promise.resolve({ id: where.id, name: `Category ${where.id}` })),
       update: jest.fn(({ where, data }) => Promise.resolve({ id: where.id, ...data })),
       delete: jest.fn(({ where }) => Promise.resolve({ id: where.id, deleted: true })),
     },
@@ -39,22 +39,22 @@ describe('CategoryService', () => {
 
   describe('create', () => {
     it('should create a category', async () => {
-      const dto: CreateCategoryDto = { nombre: 'New Category' } as CreateCategoryDto;
+      const dto: CreateCategoryDto = { name: 'New Category' } as CreateCategoryDto;
       expect(await categoryService.create(dto)).toEqual({
         id: '1',
-        nombre: 'New Category',
+        name: 'New Category',
       });
-      expect(prismaService.categoria.create).toHaveBeenCalledWith({ data: dto });
+      expect(prismaService.category.create).toHaveBeenCalledWith({ data: dto });
     });
   });
 
   describe('findAll', () => {
     it('should return all categories', async () => {
       expect(await categoryService.findAll()).toEqual([
-        { id: '1', nombre: 'Category 1' },
-        { id: '2', nombre: 'Category 2' },
+        { id: '1', name: 'Category 1' },
+        { id: '2', name: 'Category 2' },
       ]);
-      expect(prismaService.categoria.findMany).toHaveBeenCalled();
+      expect(prismaService.category.findMany).toHaveBeenCalled();
     });
   });
 
@@ -62,20 +62,20 @@ describe('CategoryService', () => {
     it('should return a single category', async () => {
       expect(await categoryService.findOne('1')).toEqual({
         id: '1',
-        nombre: 'Category 1',
+        name: 'Category 1',
       });
-      expect(prismaService.categoria.findUnique).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(prismaService.category.findUnique).toHaveBeenCalledWith({ where: { id: '1' } });
     });
   });
 
   describe('update', () => {
     it('should update a category', async () => {
-      const dto: UpdateCategoryDto = { nombre: 'Updated Category' } as UpdateCategoryDto;
+      const dto: UpdateCategoryDto = { name: 'Updated Category' } as UpdateCategoryDto;
       expect(await categoryService.update('1', dto)).toEqual({
         id: '1',
-        nombre: 'Updated Category',
+        name: 'Updated Category',
       });
-      expect(prismaService.categoria.update).toHaveBeenCalledWith({ where: { id: '1' }, data: dto });
+      expect(prismaService.category.update).toHaveBeenCalledWith({ where: { id: '1' }, data: dto });
     });
   });
 
@@ -85,7 +85,7 @@ describe('CategoryService', () => {
         id: '1',
         deleted: true,
       });
-      expect(prismaService.categoria.delete).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(prismaService.category.delete).toHaveBeenCalledWith({ where: { id: '1' } });
     });
   });
 });

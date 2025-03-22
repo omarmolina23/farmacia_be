@@ -11,14 +11,14 @@ describe('SupplierService', () => {
   let prismaService: PrismaService;
 
   const mockPrismaService = {
-    proveedor: {
+    supplier: {
       create: jest.fn((dto) => Promise.resolve({ id: '1', ...dto.data })),
       findMany: jest.fn(() => Promise.resolve([
-        { id: '1', nombre: 'Proveedor 1', telefono: '+573001234567', correo: 'proveedor1@example.com', estado: Status.ACTIVO },
-        { id: '2', nombre: 'Proveedor 2', telefono: '+573009876543', correo: 'proveedor2@example.com', estado: Status.INACTIVO },
+        { id: '1', name: 'Proveedor 1', phone: '+573001234567', email: 'proveedor1@example.com', status: Status.ACTIVE },
+        { id: '2', name: 'Proveedor 2', phone: '+573009876543', email: 'proveedor2@example.com', status: Status.INACTIVE },
       ])),
       findUnique: jest.fn(({ where }) => Promise.resolve(
-        where.id === '1' ? { id: '1', nombre: 'Proveedor 1', telefono: '+573001234567', correo: 'proveedor1@example.com', estado: Status.ACTIVO } : null
+        where.id === '1' ? { id: '1', name: 'Proveedor 1', phone: '+573001234567', email: 'proveedor1@example.com', status: Status.ACTIVE } : null
       )),
       update: jest.fn(({ where, data }) => Promise.resolve({ id: where.id, ...data })),
       delete: jest.fn(({ where }) => Promise.resolve({ id: where.id, deleted: true })),
@@ -44,26 +44,26 @@ describe('SupplierService', () => {
   describe('create', () => {
     it('should create a supplier', async () => {
       const dto: CreateSupplierDto = {
-        nombre: 'Proveedor Nuevo',
-        telefono: '+573001234567',
-        correo: 'nuevo@proveedor.com',
-        estado: Status.ACTIVO,
+        name: 'Proveedor Nuevo',
+        phone: '+573001234567',
+        email: 'nuevo@proveedor.com',
+        status: Status.ACTIVE,
       };
       expect(await supplierService.create(dto)).toEqual({
         id: '1',
         ...dto,
       });
-      expect(prismaService.proveedor.create).toHaveBeenCalledWith({ data: dto });
+      expect(prismaService.supplier.create).toHaveBeenCalledWith({ data: dto });
     });
 
     it('should throw a ConflictException if supplier already exists', async () => {
-      mockPrismaService.proveedor.create.mockRejectedValueOnce({ code: 'P2002' });
+      mockPrismaService.supplier.create.mockRejectedValueOnce({ code: 'P2002' });
 
       const dto: CreateSupplierDto = {
-        nombre: 'Proveedor Duplicado',
-        telefono: '+573001234567',
-        correo: 'duplicado@proveedor.com',
-        estado: Status.ACTIVO,
+        name: 'Proveedor Duplicado',
+        phone: '+573001234567',
+        email: 'duplicado@proveedor.com',
+        status: Status.ACTIVE,
       };
 
       await expect(supplierService.create(dto)).rejects.toThrow(ConflictException);
@@ -73,10 +73,10 @@ describe('SupplierService', () => {
   describe('findAll', () => {
     it('should return all suppliers', async () => {
       expect(await supplierService.findAll()).toEqual([
-        { id: '1', nombre: 'Proveedor 1', telefono: '+573001234567', correo: 'proveedor1@example.com', estado: Status.ACTIVO },
-        { id: '2', nombre: 'Proveedor 2', telefono: '+573009876543', correo: 'proveedor2@example.com', estado: Status.INACTIVO },
+        { id: '1', name: 'Proveedor 1', phone: '+573001234567', email: 'proveedor1@example.com', status: Status.ACTIVE },
+        { id: '2', name: 'Proveedor 2', phone: '+573009876543', email: 'proveedor2@example.com', status: Status.INACTIVE },
       ]);
-      expect(prismaService.proveedor.findMany).toHaveBeenCalled();
+      expect(prismaService.supplier.findMany).toHaveBeenCalled();
     });
   });
 
@@ -84,12 +84,12 @@ describe('SupplierService', () => {
     it('should return a single supplier', async () => {
       expect(await supplierService.findOne('1')).toEqual({
         id: '1',
-        nombre: 'Proveedor 1',
-        telefono: '+573001234567',
-        correo: 'proveedor1@example.com',
-        estado: Status.ACTIVO,
+        name: 'Proveedor 1',
+        phone: '+573001234567',
+        email: 'proveedor1@example.com',
+        status: Status.ACTIVE,
       });
-      expect(prismaService.proveedor.findUnique).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(prismaService.supplier.findUnique).toHaveBeenCalledWith({ where: { id: '1' } });
     });
 
     it('should throw NotFoundException if supplier does not exist', async () => {
@@ -99,12 +99,12 @@ describe('SupplierService', () => {
 
   describe('update', () => {
     it('should update a supplier', async () => {
-      const dto: UpdateSupplierDto = { nombre: 'Proveedor Actualizado' };
+      const dto: UpdateSupplierDto = { name: 'Proveedor Actualizado' };
       expect(await supplierService.update('1', dto)).toEqual({
         id: '1',
-        nombre: 'Proveedor Actualizado',
+        name: 'Proveedor Actualizado',
       });
-      expect(prismaService.proveedor.update).toHaveBeenCalledWith({ where: { id: '1' }, data: dto });
+      expect(prismaService.supplier.update).toHaveBeenCalledWith({ where: { id: '1' }, data: dto });
     });
   });
 
@@ -114,7 +114,7 @@ describe('SupplierService', () => {
         id: '1',
         deleted: true,
       });
-      expect(prismaService.proveedor.delete).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(prismaService.supplier.delete).toHaveBeenCalledWith({ where: { id: '1' } });
     });
   });
 });

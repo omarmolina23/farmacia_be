@@ -1,26 +1,26 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsEnum, IsString, IsPhoneNumber } from 'class-validator';
 
 export enum Status {
-  ACTIVO = 'ACTIVO',
-  INACTIVO = 'INACTIVO',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
 }
 
 export class CreateSupplierDto {
   @IsString()
   @IsNotEmpty()
-  nombre: string;
+  name: string;
 
   @IsPhoneNumber()
   @IsNotEmpty()
-  telefono: string;
+  phone: string;
 
   @IsEmail()
   @IsNotEmpty()
-  correo: string;
+  email: string;
 
   @IsEnum(Status)
   @IsOptional()
-  estado: Status;
+  status: Status;
 }
 
 

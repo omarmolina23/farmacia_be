@@ -14,10 +14,10 @@ describe('SupplierController', () => {
       ...dto,
     })),
     findAll: jest.fn(() => [
-      { id: '1', nombre: 'Supplier 1' },
-      { id: '2', nombre: 'Supplier 2' },
+      { id: '1', name: 'Supplier 1' },
+      { id: '2', name: 'Supplier 2' },
     ]),
-    findOne: jest.fn((id) => ({ id, nombre: `Supplier ${id}` })),
+    findOne: jest.fn((id) => ({ id, name: `Supplier ${id}` })),
     update: jest.fn((id, dto) => ({ id, ...dto })),
     remove: jest.fn((id) => ({ id, deleted: true })),
   };
@@ -38,10 +38,10 @@ describe('SupplierController', () => {
 
   describe('create', () => {
     it('should create a supplier', async () => {
-      const dto: CreateSupplierDto = { nombre: 'New Supplier' } as CreateSupplierDto;
+      const dto: CreateSupplierDto = { name: 'New Supplier' } as CreateSupplierDto;
       expect(await supplierController.create(dto)).toEqual({
         id: '1',
-        nombre: 'New Supplier',
+        name: 'New Supplier',
       });
       expect(supplierService.create).toHaveBeenCalledWith(dto);
     });
@@ -50,8 +50,8 @@ describe('SupplierController', () => {
   describe('findAll', () => {
     it('should return all suppliers', async () => {
       expect(await supplierController.findAll()).toEqual([
-        { id: '1', nombre: 'Supplier 1' },
-        { id: '2', nombre: 'Supplier 2' },
+        { id: '1', name: 'Supplier 1' },
+        { id: '2', name: 'Supplier 2' },
       ]);
       expect(supplierService.findAll).toHaveBeenCalled();
     });
@@ -61,7 +61,7 @@ describe('SupplierController', () => {
     it('should return a single supplier', async () => {
       expect(await supplierController.findOne('1')).toEqual({
         id: '1',
-        nombre: 'Supplier 1',
+        name: 'Supplier 1',
       });
       expect(supplierService.findOne).toHaveBeenCalledWith('1');
     });
@@ -69,10 +69,10 @@ describe('SupplierController', () => {
 
   describe('update', () => {
     it('should update a supplier', async () => {
-      const dto: UpdateSupplierDto = { nombre: 'Updated Supplier' } as UpdateSupplierDto;
+      const dto: UpdateSupplierDto = { name: 'Updated Supplier' } as UpdateSupplierDto;
       expect(await supplierController.update('1', dto)).toEqual({
         id: '1',
-        nombre: 'Updated Supplier',
+        name: 'Updated Supplier',
       });
       expect(supplierService.update).toHaveBeenCalledWith('1', dto);
     });

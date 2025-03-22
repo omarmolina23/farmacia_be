@@ -14,10 +14,10 @@ describe('CategoryController', () => {
       ...dto,
     })),
     findAll: jest.fn(() => [
-      { id: '1', nombre: 'Category 1' },
-      { id: '2', nombre: 'Category 2' },
+      { id: '1', name: 'Category 1' },
+      { id: '2', name: 'Category 2' },
     ]),
-    findOne: jest.fn((id) => ({ id, nombre: `Category ${id}` })),
+    findOne: jest.fn((id) => ({ id, name: `Category ${id}` })),
     update: jest.fn((id, dto) => ({ id, ...dto })),
     remove: jest.fn((id) => ({ id, deleted: true })),
   };
@@ -38,7 +38,7 @@ describe('CategoryController', () => {
 
   describe('create', () => {
     it('should create a category', async () => {
-      const dto: CreateCategoryDto = { nombre: 'New Category' } as CreateCategoryDto;
+      const dto: CreateCategoryDto = { name: 'New Category' } as CreateCategoryDto;
       expect(await categoryController.create(dto)).toEqual({
         id: '1',
         ...dto,
@@ -50,8 +50,8 @@ describe('CategoryController', () => {
   describe('findAll', () => {
     it('should return all categories', async () => {
       expect(await categoryController.findAll()).toEqual([
-        { id: '1', nombre: 'Category 1' },
-        { id: '2', nombre: 'Category 2' },
+        { id: '1', name: 'Category 1' },
+        { id: '2', name: 'Category 2' },
       ]);
       expect(categoryService.findAll).toHaveBeenCalled();
     });
@@ -61,7 +61,7 @@ describe('CategoryController', () => {
     it('should return a single category', async () => {
       expect(await categoryController.findOne('1')).toEqual({
         id: '1',
-        nombre: 'Category 1',
+        name: 'Category 1',
       });
       expect(categoryService.findOne).toHaveBeenCalledWith('1');
     });
@@ -69,7 +69,7 @@ describe('CategoryController', () => {
 
   describe('update', () => {
     it('should update a category', async () => {
-      const dto: UpdateCategoryDto = { nombre: 'Updated Category' } as UpdateCategoryDto;
+      const dto: UpdateCategoryDto = { name: 'Updated Category' } as UpdateCategoryDto;
       expect(await categoryController.update('1', dto)).toEqual({
         id: '1',
         ...dto,

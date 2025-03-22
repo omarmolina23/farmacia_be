@@ -13,7 +13,7 @@ export class SupplierService {
 
   async create(createSupplierDto: CreateSupplierDto) {
     try {
-      return await this.prisma.proveedor.create({
+      return await this.prisma.supplier.create({
         data: {
           ...createSupplierDto,
         },
@@ -27,11 +27,11 @@ export class SupplierService {
   }
 
   async findAll() {
-    return await this.prisma.proveedor.findMany();
+    return await this.prisma.supplier.findMany();
   }
 
   async findOne(id: string) {
-    const supplier = await this.prisma.proveedor.findUnique({
+    const supplier = await this.prisma.supplier.findUnique({
       where: {
         id: id,
       },
@@ -45,7 +45,7 @@ export class SupplierService {
   }
 
   async update(id: string, updateSupplierDto: UpdateSupplierDto) {
-    const updateSupplier = await this.prisma.proveedor.update({
+    const updateSupplier = await this.prisma.supplier.update({
       where: {
         id: id,
       },
@@ -62,7 +62,7 @@ export class SupplierService {
   }
 
   async remove(id: string) {
-    const deleteSupplier = await this.prisma.proveedor.delete({
+    const deleteSupplier = await this.prisma.supplier.delete({
       where: {
         id: id,
       },
