@@ -19,7 +19,9 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({whitelist: true}));
   app.setGlobalPrefix('api');
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT || 3000;
+  console.log("Port: ", port);
+  await app.listen(port, '0.0.0.0');
 }
 
 bootstrap();
