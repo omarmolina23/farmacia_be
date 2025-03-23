@@ -75,7 +75,7 @@ export class AuthService {
             const payload = { id: id, sub: email };
 
             if (!isAdmin && !isEmployee) {
-                throw new BadRequestException('El usuario debe ser administrador o empleado');
+                throw new BadRequestException('El usuario debe ser administrador o al menos empleado');
             };
 
             await this.usersService.create({
