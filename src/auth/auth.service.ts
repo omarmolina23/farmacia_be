@@ -28,17 +28,17 @@ export class AuthService {
             const user = await this.usersService.findOneByEmail(email);
 
             if (!user.password) {
-                throw new BadRequestException('Password not set');
+                throw new BadRequestException('Contraseña no establecida');
             }
 
             if (user.status === Status.INACTIVE) {
-                throw new UnauthorizedException('User is inactive');
+                throw new UnauthorizedException('El usuario no está activo');
             }
 
             const isPasswordValid = await bcrypt.compare(password, user.password);
 
             if (!isPasswordValid) {
-                throw new UnauthorizedException('Invalid credentials');
+                throw new UnauthorizedException('Credenciales inválidas');
             }
 
             const token = this.jwtService.sign({ id: user.id, isAdmin: user.isAdmin, isEmployee: user.isEmployee, sub: user.email }, { expiresIn: '1h' });
@@ -59,6 +59,7 @@ export class AuthService {
                 name: user.name,
                 isAdmin: user.isAdmin,
                 isEmployee: user.isEmployee,
+                status: user.status,
             });
 
         } catch (error) {
@@ -74,7 +75,7 @@ export class AuthService {
             const payload = { id: id, sub: email };
 
             if (!isAdmin && !isEmployee) {
-                throw new BadRequestException('User must be either an admin or an employee');
+                throw new BadRequestException('El usuario debe ser administrador o empleado');
             };
 
             await this.usersService.create({
@@ -100,17 +101,17 @@ export class AuthService {
             })
 
             return {
-                message: 'User created successfully',
+                message: 'Usuario registrado exitosamente',
                 token,
             }
 
         } catch (error) {
             if (error.code === 'P2002' && error.meta?.target) {
                 if (error.meta.target.includes('id')) {
-                    throw new ConflictException('User already exists');
+                    throw new ConflictException('El usuario ya está registrado');
                 }
                 if (error.meta.target.includes('email')) {
-                    throw new ConflictException('Email is already registered');
+                    throw new ConflictException('El email ya está registrado');
                 }
             }
             throw error;
@@ -121,7 +122,7 @@ export class AuthService {
         response.clearCookie('refreshToken', { path: '/' });
 
         response.status(200).send({
-            message: 'User signed out successfully',
+            message: 'Se ha cerrado la sesión correctamente',
         });
     }
 
@@ -133,7 +134,7 @@ export class AuthService {
             const user = await this.usersService.findOne(decoded.id);
 
             if (!user) {
-                throw new NotFoundException('User not found');
+                throw new NotFoundException('Usuario no encontrado');
             }
 
             const hashedPassword = await bcrypt.hash(setPasswordUserDto.password, 10);
@@ -144,13 +145,13 @@ export class AuthService {
             await this.usersService.update(user.id, { password: hashedPassword, status: Status.ACTIVE });
 
             return {
-                message: "Password updated successfully",
+                message: "Contraseña establecida correctamente",
                 token: tokenSession,
                 refreshToken: refreshToken
             };
         } catch (error) {
             if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-                throw new UnauthorizedException('Invalid or expired token');
+                throw new UnauthorizedException('Token inválido o expirado');
             }
             throw error;
         }
