@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Query,
   Patch,
   Param,
   Delete,
@@ -25,9 +26,11 @@ export class CategoryController {
     return this.categoryService.findAll();
   }
 
-  @Get(':name')
-  findOne(@Param('name') name: string) {
-    return this.categoryService.findByName(name);
+  @Get('search')
+  search(
+    @Query('query') query?: string,
+  ){
+    return this.categoryService.findByName(query);
   }
 
   @Patch(':id')

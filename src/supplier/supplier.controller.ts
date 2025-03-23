@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Query, 
   Patch,
   Param,
   Delete,
@@ -25,9 +26,11 @@ export class SupplierController {
     return this.supplierService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.supplierService.findOne(id);
+  @Get('search')
+  search(
+    @Query('query') query?: string,
+  ) {
+    return this.supplierService.findByNameOrEmail(query);
   }
 
   @Patch(':id')

@@ -9,7 +9,7 @@ import { UpdateCategoryDto } from './dto/update.category';
 
 @Injectable()
 export class CategoryService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createCategoryDto: CreateCategoryDto) {
     try {
@@ -30,10 +30,13 @@ export class CategoryService {
     return await this.prisma.category.findMany();
   }
 
-  async findByName(name: string) {
+  async findByName(query?: string) {
     const category = await this.prisma.category.findMany({
       where: {
-        name: name,
+        name: {
+          contains: query,
+          mode: 'insensitive',
+        },
       },
     })
 
@@ -58,15 +61,20 @@ export class CategoryService {
   }
 
   async remove(id: string) {
-    const deleteCategory = await this.prisma.category.delete({
-      where: {
-        id: id,
-      },
-    });
-    if (!deleteCategory) {
-      throw new NotFoundException(`La categoria con ID ${id} no fue encontrada`);
+    try {
+      const category = await this.prisma.category.findUnique({ where: { id } });
+
+      if (!category) {
+        throw new NotFoundException(`La categoría con ID ${id} no fue encontrada`);
+      }
+
+      return await this.prisma.category.update({
+        where: { id },
+        data: { status: 'INACTIVE' },
+      })
+    } catch (error) {
+      throw error;
     }
 
-    return deleteCategory;
   }
 }
