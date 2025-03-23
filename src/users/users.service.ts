@@ -59,13 +59,9 @@ export class UsersService {
 }
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
-
-      console.log("id", id);
       const user = await this.prisma.user.findUnique({
         where: { id },
       });
-
-      console.log("user", user);
 
       if (!user) {
         throw new NotFoundException('User not found');
@@ -76,7 +72,6 @@ export class UsersService {
         data: updateUserDto,
       });
     } catch (error) {
-      console.log("error", error);
       throw error;
     }
   }

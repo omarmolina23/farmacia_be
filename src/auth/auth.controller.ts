@@ -5,8 +5,6 @@ import { SetPasswordUserDto } from 'src/users/dto/set-password-user.dto';
 import { ForgotPasswordDto } from 'src/users/dto/forgot-password.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './guard/auth.guard';
-import { RolesGuard } from './guard/roles.guard';
-import { Roles } from './guard/roles.decorator';
 import { FastifyReply } from 'fastify';
 
 
@@ -35,7 +33,7 @@ export class AuthController {
         return this.authService.signOut(response);
     }
 
-    @UseGuards(AuthGuard, RolesGuard)
+    @UseGuards(AuthGuard)
     @Post('set-password')
     setPassword(
         @Query('token') token: string,
