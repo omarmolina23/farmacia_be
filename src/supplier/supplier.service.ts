@@ -78,6 +78,4 @@ export class SupplierService {
       throw error;
     }
   }
-
-
 }
