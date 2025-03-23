@@ -7,7 +7,6 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from './guard/auth.guard';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
-
 @Controller('auth')
 export class AuthController {
 
