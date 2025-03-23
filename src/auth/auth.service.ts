@@ -190,9 +190,13 @@ export class AuthService {
 
     }
 
-    async refreshToken(token: string) {
+    async refreshToken(refreshToken?: string) {
         try {
-            const decoded = this.jwtService.verify(token, { secret: process.env.JWT_SECRET }) as { id: string, sub: string };
+            if (!refreshToken) {
+                throw new UnauthorizedException('Token no proporcionado');
+            }
+
+            const decoded = this.jwtService.verify(refreshToken, { secret: process.env.JWT_SECRET }) as { id: string, sub: string };
 
             const user = await this.usersService.findOne(decoded.id);
 
