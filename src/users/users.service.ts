@@ -44,18 +44,18 @@ export class UsersService {
 
   async findOneByNameOrId(query?: string) {
     if (!query) {
-        return await this.prisma.user.findMany();
+      return await this.prisma.user.findMany();
     }
 
     return await this.prisma.user.findMany({
-        where: {
-            OR: [
-                { name: { contains: query, mode: 'insensitive' } },
-                { id: query },
-            ],
-        },
+      where: {
+        OR: [
+          { name: { contains: query, mode: 'insensitive' } },
+          { id: query },
+        ],
+      },
     });
-}
+  }
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
       const user = await this.prisma.user.findUnique({
@@ -76,14 +76,21 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+      });
 
-    return await this.prisma.user.update({
-      where: { id },
-      data: { status: 'INACTIVE' },
-    })
+      if (!user) {
+        throw new NotFoundException('Usuario no encontrado');
+      }
 
+      return await this.prisma.user.update({
+        where: { id },
+        data: { status: 'INACTIVE' },
+      })
+    } catch (error) {
+      throw error;
+    }
   }
 }

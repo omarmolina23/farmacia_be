@@ -1,12 +1,11 @@
-import { Body, Res, Query, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Res, Query, Controller, Post, UseGuards, Req } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginUserDto } from 'src/users/dto/login-user.dto';
 import { SetPasswordUserDto } from 'src/users/dto/set-password-user.dto';
 import { ForgotPasswordDto } from 'src/users/dto/forgot-password.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './guard/auth.guard';
-import { FastifyReply } from 'fastify';
-
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 @Controller('auth')
 export class AuthController {
@@ -48,7 +47,10 @@ export class AuthController {
     }
 
     @Post('refresh-token')
-    refreshToken(@Query('refreshToken') refreshToken: string) {
+    refreshToken(
+        @Req() request: FastifyRequest,
+    ) {
+        const refreshToken = request.cookies.refreshToken;
         return this.authService.refreshToken(refreshToken);
     }
 }
