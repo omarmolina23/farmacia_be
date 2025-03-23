@@ -20,7 +20,7 @@ export class CategoryService {
       });
     } catch (error) {
       if (error.code === 'P2002') {
-        throw new ConflictException('Category already exists');
+        throw new ConflictException('Ya existe la categoria');
       }
       throw error;
     }
@@ -30,16 +30,12 @@ export class CategoryService {
     return await this.prisma.category.findMany();
   }
 
-  async findOne(id: string) {
-    const category = await this.prisma.category.findUnique({
+  async findByName(name: string) {
+    const category = await this.prisma.category.findMany({
       where: {
-        id: id,
+        name: name,
       },
-    });
-
-    if (!category) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
-    }
+    })
 
     return category;
   }
@@ -55,7 +51,7 @@ export class CategoryService {
     });
 
     if (!updateUser) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
+      throw new NotFoundException(`La categoría con ID ${id} no fue encontrada`);
     }
 
     return updateUser;
@@ -68,7 +64,7 @@ export class CategoryService {
       },
     });
     if (!deleteCategory) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
+      throw new NotFoundException(`La categoria con ID ${id} no fue encontrada`);
     }
 
     return deleteCategory;

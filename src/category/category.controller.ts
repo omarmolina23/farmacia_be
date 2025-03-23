@@ -25,9 +25,9 @@ export class CategoryController {
     return this.categoryService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(id);
+  @Get(':name')
+  findOne(@Param('name') name: string) {
+    return this.categoryService.findByName(name);
   }
 
   @Patch(':id')
