@@ -165,7 +165,7 @@ export class AuthService {
             const user = await this.usersService.findOneByEmail(email);
 
             if (!user) {
-                throw new NotFoundException('User not found');
+                throw new NotFoundException('Usuario no encontrado');
             }
 
             const token = this.jwtService.sign({ id: user.id, sub: user.email }, { expiresIn: '1h' });
@@ -197,7 +197,7 @@ export class AuthService {
             const user = await this.usersService.findOne(decoded.id);
 
             if (!user) {
-                throw new NotFoundException('User not found');
+                throw new NotFoundException('Usuario no encontrado');
             }
 
             const tokenSession = this.jwtService.sign({ id: user.id, isAdmin: user.isAdmin, isEmployee: user.isEmployee, sub: user.email }, { expiresIn: '1h' });
@@ -207,7 +207,7 @@ export class AuthService {
             };
         } catch (error) {
             if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-                throw new UnauthorizedException('Invalid or expired token');
+                throw new UnauthorizedException('Token inválido o expirado');
             }
             throw error;
         }

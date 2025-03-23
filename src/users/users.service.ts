@@ -64,8 +64,6 @@ export class UsersService {
         where: { id },
       });
 
-      console.log("user", user);
-
       if (!user) {
         throw new NotFoundException('Usuario no encontrado');
       }
@@ -75,7 +73,6 @@ export class UsersService {
         data: updateUserDto,
       });
     } catch (error) {
-      console.log("error", error);
       throw error;
     }
   }
