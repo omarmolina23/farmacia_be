@@ -176,7 +176,7 @@ export class AuthService {
                 template: 'forgot-password',
                 context: {
                     name: user.name,
-                    reset_link: `http://localhost:5173/auth/set-password?token=${token}`,
+                    reset_link: `http://localhost:5173/reset-password?token=${token}`,
                 }
             })
 
