@@ -36,12 +36,26 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
 
   app.enableCors({
-    origin: ['http://localhost:5173'], // Orígenes permitidos
-    methods: 'GET,HEAD,PUT,PATCH,POST', // Métodos permitidos
-    allowedHeaders: 'Content-Type, Authorization', // Encabezados permitidos
-    credentials: true, // Permitir credenciales (cookies, autorizaciones)
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        'http://localhost:5173',
+        'https://www.drogueriane.site',
+        'https://drogueriane.site',
+      ];
+  
+      const regex = /^https:\/\/farmacia-[a-zA-Z0-9]+-project\.vercel\.app$/;
+  
+      if (!origin || allowedOrigins.includes(origin) || regex.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('No permitido por CORS'), false);
+      }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true,
   });
-
+  
   await app.listen(port, '0.0.0.0');
 }
 
