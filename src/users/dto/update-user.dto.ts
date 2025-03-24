@@ -1,4 +1,5 @@
-import { IsEmail, IsOptional, IsString, IsEnum, IsBoolean, IsStrongPassword } from 'class-validator';
+import { IsEmail, IsOptional, IsString, IsEnum, IsBoolean, IsPhoneNumber} from 'class-validator';
+import { IsStrongPasswordCustom } from '../validators/is-strong-password.decorator';
 
 export enum Status {
     ACTIVE = 'ACTIVE',
@@ -12,7 +13,7 @@ export class UpdateUserDto {
     name?: string;
 
     @IsOptional()
-    @IsString()
+    @IsPhoneNumber()
     phone?: string;
 
     @IsOptional()
@@ -21,7 +22,7 @@ export class UpdateUserDto {
 
     @IsOptional()
     @IsString()
-    @IsStrongPassword()
+    @IsStrongPasswordCustom()
     password?: string;
 
     @IsOptional()
@@ -35,6 +36,4 @@ export class UpdateUserDto {
     @IsOptional()
     @IsBoolean()
     isEmployee?: boolean;
-
-
  }

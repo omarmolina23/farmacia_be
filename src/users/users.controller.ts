@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
-import { Roles } from 'src/auth/guard/roles.decorator';
+import { Roles } from 'src/auth/validators/roles.decorator';
 
 @Controller('users')
 @ApiTags('Users')
