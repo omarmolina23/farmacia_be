@@ -134,7 +134,7 @@ export class AuthService {
             const user = await this.usersService.findOne(decoded.id);
 
             if (!user) {
-                throw new NotFoundException('Usuario no encontrado');
+                throw new NotFoundException('Correo no encontrado');
             }
 
             const hashedPassword = await bcrypt.hash(setPasswordUserDto.password, 10);
@@ -165,7 +165,7 @@ export class AuthService {
             const user = await this.usersService.findOneByEmail(email);
 
             if (!user) {
-                throw new NotFoundException('Usuario no encontrado');
+                throw new NotFoundException('Correo no encontrado');
             }
 
             const token = this.jwtService.sign({ id: user.id, sub: user.email }, { expiresIn: '1h' });
@@ -176,7 +176,7 @@ export class AuthService {
                 template: 'forgot-password',
                 context: {
                     name: user.name,
-                    reset_link: `http://localhost:3000/auth/set-password?token=${token}`,
+                    reset_link: `http://localhost:5173/auth/set-password?token=${token}`,
                 }
             })
 

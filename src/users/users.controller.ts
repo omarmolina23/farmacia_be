@@ -1,4 +1,5 @@
-import { Controller, Body, Query, Param, Get, UseGuards, Patch, UsePipes, ValidationPipe, Delete } from '@nestjs/common';
+import { Controller, Body, Query, Param, Get, UseGuards, Patch, Delete } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger'
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
@@ -6,6 +7,7 @@ import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Roles } from 'src/auth/guard/roles.decorator';
 
 @Controller('users')
+@ApiTags('Users')
 export class UsersController {
 
     constructor(private readonly usersService: UsersService) { }
@@ -13,6 +15,9 @@ export class UsersController {
     @UseGuards(AuthGuard, RolesGuard)
     @Roles('admin')
     @Get('all')
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Get all users' })
+    @ApiResponse({ status: 200, description: 'Get all users correctly' })
     findAll() {
         return this.usersService.findAll();
     }
