@@ -170,13 +170,15 @@ export class AuthService {
 
             const token = this.jwtService.sign({ id: user.id, sub: user.email }, { expiresIn: '1h' });
 
+            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
             this.mailerService.sendMail({
                 to: email,
                 subject: 'Restablece tu contraseña',
                 template: 'forgot-password',
                 context: {
                     name: user.name,
-                    reset_link: `http://localhost:5173/reset-password?token=${token}`,
+                    reset_link: `${frontendUrl}/reset-password?token=${token}`,
                 }
             })
 
@@ -209,6 +211,18 @@ export class AuthService {
             return {
                 token: tokenSession,
             };
+        } catch (error) {
+            if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+                throw new UnauthorizedException('Token inválido o expirado');
+            }
+            throw error;
+        }
+    }
+
+    async validateToken (token: string) {
+        try {
+            const decoded = this.jwtService.verify(token, { secret: process.env.JWT_SECRET }) as { id: string, sub: string };
+            return decoded;
         } catch (error) {
             if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
                 throw new UnauthorizedException('Token inválido o expirado');

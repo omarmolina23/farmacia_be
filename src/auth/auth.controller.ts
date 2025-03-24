@@ -53,4 +53,9 @@ export class AuthController {
         const refreshToken = request.cookies.refreshToken;
         return this.authService.refreshToken(refreshToken);
     }
+
+    @Post('validate-token')
+    validateToken(@Body('token') token: string) {
+        return this.authService.validateToken(token);
+    }
 }
