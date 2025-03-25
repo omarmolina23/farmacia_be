@@ -64,6 +64,9 @@ export class SupplierService {
       return updateSupplier;  
     }
     catch(error){
+      if (error.code === 'P2002') {
+        throw new ConflictException('El proveedor ya existe');
+      }
       throw error;
     }
   }
