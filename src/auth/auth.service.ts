@@ -90,15 +90,13 @@ export class AuthService {
 
             const token = this.jwtService.sign(payload, { expiresIn: '1h' });
 
-            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-
             this.mailerService.sendMail({
                 to: email,
                 subject: 'Establece tu contraseña',
                 template: 'set-password',
                 context: {
                     name: name,
-                    reset_link: `${frontendUrl}/reset-password?token=${token}`,
+                    reset_link: `http://localhost:3000/auth/set-password?token=${token}`,
                 }
             })
 
