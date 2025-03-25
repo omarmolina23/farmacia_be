@@ -46,20 +46,29 @@ export class SupplierService {
   }
 
   async update(id: string, updateSupplierDto: UpdateSupplierDto) {
-    const updateSupplier = await this.prisma.supplier.update({
-      where: {
-        id: id,
-      },
-      data: {
-        ...updateSupplierDto,
-      },
-    });
 
-    if (!updateSupplier) {
-      throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
+    try{
+      const updateSupplier = await this.prisma.supplier.update({
+        where: {
+          id: id,
+        },
+        data: {
+          ...updateSupplierDto,
+        },
+      });
+
+      if (!updateSupplier) {
+        throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
+      }
+
+      return updateSupplier;  
     }
-
-    return updateSupplier;
+    catch(error){
+      if (error.code === 'P2002') {
+        throw new ConflictException('El proveedor ya existe');
+      }
+      throw error;
+    }
   }
 
   async remove(id: string) {
