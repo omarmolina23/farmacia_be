@@ -17,7 +17,7 @@ describe('SupplierController', () => {
       { id: '1', name: 'Supplier 1' },
       { id: '2', name: 'Supplier 2' },
     ]),
-    findOne: jest.fn((id) => ({ id, name: `Supplier ${id}` })),
+    findByNameOrEmail: jest.fn((query) => [{ id: '1', name: query, email: 'test@example.com' }]),
     update: jest.fn((id, dto) => ({ id, ...dto })),
     remove: jest.fn((id) => ({ id, deleted: true })),
   };
@@ -57,13 +57,12 @@ describe('SupplierController', () => {
     });
   });
 
-  describe('findOne', () => {
-    it('should return a single supplier', async () => {
-      expect(await supplierController.findOne('1')).toEqual({
-        id: '1',
-        name: 'Supplier 1',
-      });
-      expect(supplierService.findOne).toHaveBeenCalledWith('1');
+  describe('search', () => {
+    it('should search suppliers by query', async () => {
+      expect(await supplierController.search('Supplier 1')).toEqual([
+        { id: '1', name: 'Supplier 1', email: 'test@example.com' },
+      ]);
+      expect(supplierService.findByNameOrEmail).toHaveBeenCalledWith('Supplier 1');
     });
   });
 

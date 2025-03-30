@@ -17,7 +17,7 @@ describe('CategoryController', () => {
       { id: '1', name: 'Category 1' },
       { id: '2', name: 'Category 2' },
     ]),
-    findOne: jest.fn((id) => ({ id, name: `Category ${id}` })),
+    findByName: jest.fn(() => ({ id: '1', name: `Category 1` })),
     update: jest.fn((id, dto) => ({ id, ...dto })),
     remove: jest.fn((id) => ({ id, deleted: true })),
   };
@@ -57,13 +57,13 @@ describe('CategoryController', () => {
     });
   });
 
-  describe('findOne', () => {
+  describe('findByName', () => {
     it('should return a single category', async () => {
-      expect(await categoryController.findOne('1')).toEqual({
+      expect(await categoryController.search('Category 1')).toEqual({
         id: '1',
         name: 'Category 1',
       });
-      expect(categoryService.findOne).toHaveBeenCalledWith('1');
+      expect(categoryService.findByName).toHaveBeenCalledWith('Category 1');
     });
   });
 
