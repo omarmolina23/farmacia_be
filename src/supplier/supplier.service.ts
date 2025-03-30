@@ -9,7 +9,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class SupplierService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(createSupplierDto: CreateSupplierDto) {
     try {
@@ -35,7 +35,7 @@ export class SupplierService {
       return await this.prisma.supplier.findMany();
     }
 
-    return await this.prisma.supplier.findMany({
+    const suppliers = await this.prisma.supplier.findMany({
       where: {
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
@@ -43,11 +43,18 @@ export class SupplierService {
         ],
       },
     });
+
+    if (!suppliers.length) {
+      throw new NotFoundException(
+        `No se encontraron proveedores con el nombre o email "${query}"`,
+      );
+    }
+
+    return suppliers;
   }
 
   async update(id: string, updateSupplierDto: UpdateSupplierDto) {
-
-    try{
+    try {
       const updateSupplier = await this.prisma.supplier.update({
         where: {
           id: id,
@@ -61,9 +68,8 @@ export class SupplierService {
         throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
       }
 
-      return updateSupplier;  
-    }
-    catch(error){
+      return updateSupplier;
+    } catch (error) {
       if (error.code === 'P2002') {
         throw new ConflictException('El proveedor ya existe');
       }
