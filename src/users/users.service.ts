@@ -1,5 +1,5 @@
 import { Injectable, Body, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -47,6 +47,7 @@ export class UsersService {
       return await this.prisma.user.findMany();
     }
 
+    
     return await this.prisma.user.findMany({
       where: {
         OR: [
