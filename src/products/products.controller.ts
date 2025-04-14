@@ -33,4 +33,16 @@ export class ProductsController {
     findByNameOrId(@Query('query') query?: string) {
         return this.productsService.findByNameOrId(query);
     }
+
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updateProductDto: any) {
+        return this.productsService.update(id, updateProductDto);
+    }
+
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.productsService.remove(id);
+    }
+
+    
 }

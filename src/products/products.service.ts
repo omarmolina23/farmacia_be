@@ -29,6 +29,22 @@ export class ProductsService {
         });
     }
 
+    async update(id: string, updateProductDto: any) {
+        try {
+            const product = await this.prisma.product.findUnique({ where: { id } });
+
+            if (!product) {
+                throw new NotFoundException('Producto no encontrado');
+            }
+            return await this.prisma.product.update({
+                where: { id },
+                data: updateProductDto,
+            });
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async remove(id: string) {
         try{
             const product = await this.prisma.product.findUnique({ where: { id } });
