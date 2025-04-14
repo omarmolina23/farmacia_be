@@ -100,36 +100,55 @@ export class AuthService {
         );
       }
 
-      await this.usersService.create({
-        id: id,
-        documentType: documentType,
-        name: name,
-        phone: phone,
-        email: email,
-        birthdate: new Date(birthdate),
-        isAdmin: isAdmin,
-        isEmployee: isEmployee,
-      });
+        const birthDate = new Date(birthdate);
+        const today = new Date();
 
-      const token = this.jwtService.sign(payload, { expiresIn: '1h' });
+        if (birthDate > today) {
+            throw new BadRequestException('La fecha de nacimiento no puede ser en el futuro');
+        }
 
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const hasBirthdayPassed =
+            today.getMonth() > birthDate.getMonth() ||
+            (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
 
-      try {
-        await this.mailerService.sendMail({
-          to: email,
-          subject: 'Establece tu contraseña',
-          template: 'set-password',
-          context: {
+        const actualAge = hasBirthdayPassed ? age : age - 1;
+
+        if (actualAge < 18) {
+            throw new BadRequestException('El usuario debe tener al menos 18 años');
+        }
+
+
+        await this.usersService.create({
+            id: id,
+            documentType: documentType,
             name: name,
-            reset_link: `${frontendUrl}/reset-password?token=${token}`,
-          },
+            phone: phone,
+            email: email,
+            birthdate: new Date(birthdate),
+            isAdmin: isAdmin,
+            isEmployee: isEmployee,
         });
-      } catch (error) {
-        throw new BadRequestException(
-          'Error al enviar el correo de verificación',
-        );
-      }
+
+        const token = this.jwtService.sign(payload, { expiresIn: '1h' });
+
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+        try {
+            await this.mailerService.sendMail({
+            to: email,
+            subject: 'Establece tu contraseña',
+            template: 'set-password',
+            context: {
+                name: name,
+                reset_link: `${frontendUrl}/reset-password?token=${token}`,
+            },
+            });
+        } catch (error) {
+            throw new BadRequestException(
+            'Error al enviar el correo de verificación',
+            );
+        }
 
       return {
         message: 'Usuario registrado exitosamente',
