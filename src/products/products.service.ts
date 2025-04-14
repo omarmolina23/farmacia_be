@@ -15,4 +15,35 @@ export class ProductsService {
         return await this.prisma.product.findMany();
     }
 
+    async findByNameOrId(query?: string) {
+        if (!query) {
+            return await this.prisma.product.findMany();
+        }
+        return await this.prisma.product.findMany({
+            where: {
+                OR: [
+                    { name: { contains: query, mode: 'insensitive' } },
+                    { id: query },
+                ],
+            },
+        });
+    }
+
+    async remove(id: string) {
+        try{
+            const product = await this.prisma.product.findUnique({ where: { id } });
+
+            if (!product) {
+                throw new NotFoundException('Producto no encontrado');
+            }
+
+            return await this.prisma.product.update({
+                where: { id },
+                data: { status: 'INACTIVE' },
+            })
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }

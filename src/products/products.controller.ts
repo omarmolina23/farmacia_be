@@ -28,4 +28,9 @@ export class ProductsController {
     findAll() {
         return this.productsService.findAll();
     }
+
+    @Get('search')
+    findByNameOrId(@Query('query') query?: string) {
+        return this.productsService.findByNameOrId(query);
+    }
 }
