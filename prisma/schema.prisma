@@ -60,6 +60,9 @@ model Batch {
   supplierId     String
   expirationDate DateTime
   status         Status   @default(ACTIVE)
+  number_batch    String   @db.VarChar(50)
+  amount        Int
+
 
   product  Product  @relation(fields: [productId], references: [id])
   supplier Supplier @relation(fields: [supplierId], references: [id])
@@ -75,26 +78,18 @@ model Category {
 model Product {
   id         String  @id @default(uuid())
   name       String  @db.VarChar(100)
+  description String? @db.VarChar(200)
   price      Decimal
-  status     Status  @default(INACTIVE)
+  status     Status  @default(ACTIVE)
   categoryId String
+  concentration String? @db.VarChar(50)
+  activeIngredient String? @db.VarChar(50)
+  weight    String? @db.VarChar(50)
+  volume    String? @db.VarChar(50)
 
   category Category            @relation(fields: [categoryId], references: [id])
   batches  Batch[]
   sales    SaleProductClient[]
-  snack    Snack?
-  medicine Medicine?
-}
-
-model Snack {
-  id      String  @id @default(uuid())
-  product Product @relation(fields: [id], references: [id])
-}
-
-model Medicine {
-  id      String  @id @default(uuid())
-  dose    Decimal
-  product Product @relation(fields: [id], references: [id])
 }
 
 model Sale {
