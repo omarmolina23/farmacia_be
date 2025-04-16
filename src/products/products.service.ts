@@ -29,6 +29,18 @@ export class ProductsService {
         });
     }
 
+    async findByNameOnly(query: string) {
+       if(!query) {
+            return await this.prisma.product.findMany();
+       }
+         return await this.prisma.product.findMany({
+                where: {
+                 name: { contains: query, mode: 'insensitive' },
+                },
+          });
+    }
+        
+
     async update(id: string, updateProductDto: any) {
         try {
             const product = await this.prisma.product.findUnique({ where: { id } });
