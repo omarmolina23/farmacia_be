@@ -13,13 +13,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum documentType{
+  CC   @map("Cédula de ciudadanía (CC)")
+  CE   @map("Cédula de extranjería (CE)")
+  NIT  @map("(NIT) Número de Identificación Tributaria")
+}
+
 enum Status {
   ACTIVE
   INACTIVE
 }
 
-model User {
+model User { 
   id               String   @id
+  documentType     documentType 
   name             String   @db.VarChar(50)
   phone            String   @db.VarChar(20)
   email            String   @unique @db.VarChar(50)

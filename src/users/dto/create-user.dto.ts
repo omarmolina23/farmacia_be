@@ -7,11 +7,21 @@ export enum Status {
     INACTIVE = 'INACTIVE',
 }
 
+export enum documentType {
+    CC = "CC",
+    CE = "CE",
+    NIT = "NIT"
+}
+
 export class CreateUserDto {
 
     @IsNotEmpty()
     @IsString()
     id: string;
+
+    @IsNotEmpty()
+    @IsEnum(documentType)
+    documentType: documentType;
 
     @IsNotEmpty()
     @IsString()
