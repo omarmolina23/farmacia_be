@@ -41,10 +41,6 @@ export class ProductsService {
     }
 
     async findAll() {
-        return await this.prisma.product.findMany();
-    }
-
-    async findAllUser() {
         return await this.prisma.product.findMany({
             include: {
                 category: true,
@@ -74,7 +70,7 @@ export class ProductsService {
 
     async findByNameOnly(query: string) {
         if (!query) {
-            return await this.findAllUser();
+            return await this.findAll();
         }
         return await this.prisma.product.findMany({
             where: {
