@@ -27,18 +27,11 @@ export class ProductsController {
         return this.productsService.create(createProductDto);
     }
 
-    @UseGuards(AuthGuard, RolesGuard)
-    @Roles('admin')
     @Get()
     findAll() {
         return this.productsService.findAll();
     }
-
-    @Get('detail')
-    findAllUser() {
-        return this.productsService.findAllUser();
-    }
-
+    
     @UseGuards(AuthGuard, RolesGuard)
     @Roles('admin')
     @Get('search')
