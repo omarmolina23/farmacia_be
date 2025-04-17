@@ -91,21 +91,28 @@ export class ProductsService {
         try {
 
             const {ProductTag, ...product } = updateProductDto;
-            const category = await this.prisma.category.findUnique({ where: { id: product.categoryId } });
+
+            if(product.categoryId){
+                const category = await this.prisma.category.findUnique({ where: { id: product.categoryId } });
+
+                if (!category) {
+                    throw new NotFoundException('Categoria no encontrada');
+                }
+                if (category.status === 'INACTIVE') {
+                    throw new NotFoundException('Categoria inactiva');
+                }
+            }
+            
             const productFound = await this.prisma.product.findUnique({ where: { id } });
 
             if (!productFound) {
                 throw new NotFoundException('Producto no encontrado');
             }
 
-            if (!category) {
-                throw new NotFoundException('Categoria no encontrada');
+            if (productFound.status === 'INACTIVE') {
+                throw new NotFoundException('Producto inactivo');
             }
-
-            if (category.status === 'INACTIVE') {
-                throw new NotFoundException('Categoria inactiva');
-            }
-
+            
             return await this.prisma.product.update({
                 where: { id },
                 data: {
