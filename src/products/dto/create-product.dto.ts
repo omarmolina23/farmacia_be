@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, IsNumber, IsEnum } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsNumber, IsEnum, IsArray, IsUUID } from "class-validator";
 
 
 export enum Status {
@@ -30,17 +30,23 @@ export class CreateProductDto {
 
     @IsOptional()
     @IsString()
-    concentration: string;
+    concentration?: string;
 
     @IsOptional()
     @IsString()
-    activeIngredient: string;
+    activeIngredient?: string;
 
     @IsOptional()
     @IsString()
-    weight: string;
+    weight?: string;
 
     @IsOptional()
     @IsString()
-    volume: string;
+    volume?: string;
+
+    @IsOptional()
+    @IsArray()
+    @IsUUID('all', { each: true })
+    ProductTag?: string[];
+
 }
