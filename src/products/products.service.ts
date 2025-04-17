@@ -65,6 +65,14 @@ export class ProductsService {
                     { id: query },
                 ],
             },
+            include: {
+                category: true,
+                ProductTag: {
+                    include: {
+                        tag: true,
+                    },
+                },
+            },
         });
     }
 
