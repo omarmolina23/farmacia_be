@@ -20,11 +20,15 @@ import { Roles } from 'src/auth/validators/roles.decorator';
 export class ProductsController {
     constructor(private productsService: ProductsService) {}
 
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles('admin')
     @Post()
     create(@Body() createProductDto: CreateProductDto) {
         return this.productsService.create(createProductDto);
     }
 
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles('admin')
     @Get()
     findAll() {
         return this.productsService.findAll();
@@ -35,23 +39,27 @@ export class ProductsController {
         return this.productsService.findAllUser();
     }
 
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles('admin')
     @Get('search')
     findByNameOrId(@Query('query') query?: string) {
         return this.productsService.findByNameOrId(query);
     }
-
 
     @Get('search/name')
     findByNameOnly(@Query('query') query: string) {
         return this.productsService.findByNameOnly(query);
     }
 
-
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles('admin')
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
         return this.productsService.update(id, updateProductDto);
     }
 
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles('admin')
     @Delete(':id')
     remove(@Param('id') id: string) {
         return this.productsService.remove(id);
