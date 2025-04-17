@@ -40,10 +40,12 @@ export class ProductsController {
         return this.productsService.findByNameOrId(query);
     }
 
+
     @Get('search/name')
     findByNameOnly(@Query('query') query: string) {
         return this.productsService.findByNameOnly(query);
     }
+
 
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
