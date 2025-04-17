@@ -109,10 +109,6 @@ export class ProductsService {
                 throw new NotFoundException('Producto no encontrado');
             }
 
-            if (productFound.status === 'INACTIVE') {
-                throw new NotFoundException('Producto inactivo');
-            }
-            
             return await this.prisma.product.update({
                 where: { id },
                 data: {
