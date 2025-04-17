@@ -62,7 +62,7 @@ model Batch {
   status         Status   @default(ACTIVE)
   number_batch    String   @db.VarChar(50)
   amount        Int
-
+  totalValue     Decimal @db.Decimal(10, 0) @default(0)
 
   product  Product  @relation(fields: [productId], references: [id])
   supplier Supplier @relation(fields: [supplierId], references: [id])
@@ -90,6 +90,8 @@ model Product {
   category Category            @relation(fields: [categoryId], references: [id])
   batches  Batch[]
   sales    SaleProductClient[]
+
+  ProductTag ProductTag[]
 }
 
 model Sale {
@@ -107,7 +109,24 @@ model SaleProductClient {
   clientId  String
   amount    Int
 
-  producto Product @relation(fields: [productId], references: [id])
+  products Product @relation(fields: [productId], references: [id])
   venta    Sale    @relation(fields: [saleId], references: [id])
   cliente  Client  @relation(fields: [clientId], references: [id])
+}
+
+model ProductTag {
+  id       String @id @default(uuid())
+  productId String
+  tagId     String
+
+  product Product @relation(fields: [productId], references: [id])
+  tag     Tag     @relation(fields: [tagId], references: [id])
+
+}
+
+model Tag{
+  id       String    @id @default(uuid())
+  name     String    @db.VarChar(50)
+
+  ProductTag ProductTag[]
 }
