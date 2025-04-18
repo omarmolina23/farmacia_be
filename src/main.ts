@@ -8,6 +8,7 @@ import {
 import fastifyCookie from '@fastify/cookie';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { fastifyMultipart } from '@fastify/multipart';
+import { FileSizeExceptionFilter } from './filters/file-size-exception.filter';
 
 
 async function bootstrap() {
@@ -16,7 +17,11 @@ async function bootstrap() {
     new FastifyAdapter()
   );
 
-  await app.register(fastifyMultipart)
+  await app.register(fastifyMultipart, {
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5 MB
+    },
+  })
 
   const globalPrefix = 'api';
   const port = process.env.PORT || 3000;
@@ -35,6 +40,7 @@ async function bootstrap() {
     secret: process.env.SECRET,
   });
 
+  app.useGlobalFilters(new FileSizeExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.setGlobalPrefix(globalPrefix);
 

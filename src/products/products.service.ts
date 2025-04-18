@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -57,22 +57,22 @@ export class ProductsService {
 
             if(files){
 
-                console.log("Files received:", files); // Verifica que los archivos están llegando correctamente
+                console.log("Files received:", files, files.length, maxFiles); // Verifica que los archivos están llegando correctamente
                 if(files.length > maxFiles) {
-                    throw new NotFoundException('Se han subido demasiados archivos (máximo 3)');
+                    console.log("Hi")
+                    throw new BadRequestException('Se han subido demasiados archivos (máximo 3)');
                 }
 
                 for(const file of files) {
                     if(!allowedFileTypes.includes(file.mimetype)) {
-                        throw new NotFoundException('Tipo de archivo no permitido (solo jpeg, png, jpg y webp)');
+                        throw new BadRequestException('Tipo de archivo no permitido (solo jpeg, png, jpg y webp)');
                     }
                     if(file.size > maxFileSize) {
-                        throw new NotFoundException('El tamaño del archivo es demasiado grande (máximo 5MB)');
+                        throw new BadRequestException('El tamaño del archivo es demasiado grande (máximo 5MB)');
                     }
                 }
 
                 const currentDate = new Date();
-                const formattedDate = currentDate.toISOString().replace(/[-:]/g, '').split('.')[0]; // YYYYMMDD_HHMMSS
 
                 const uploadedImages = await Promise.all(
                     files.map(file =>
@@ -115,6 +115,11 @@ export class ProductsService {
                         tag: true,
                     },
                 },
+                images: {
+                    select: {
+                        url: true,
+                    },
+                }
             },
         });
     }
@@ -138,6 +143,11 @@ export class ProductsService {
                         tag: true,
                     },
                 },
+                images:{
+                    select: {
+                        url: true,
+                    },
+                }
             },
         });
     }
@@ -157,6 +167,11 @@ export class ProductsService {
                         tag: true,
                     },
                 },
+                images:{
+                    select: {
+                        url: true,
+                    },
+                }
             },
         });
     }
