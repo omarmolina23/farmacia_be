@@ -18,6 +18,7 @@ import {
     UsePipes,
     ValidationPipe,
     BadRequestException,
+    NotFoundException,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -42,14 +43,6 @@ export class ProductsController {
     @UseGuards(AuthGuard, RolesGuard)
     @Roles('admin')
     @Post()
-    create(
-        @UploadedFiles() files: Express.Multer.File[],
-        @Body() createProductDto: CreateProductDto
-    ) {
-        return this.productsService.create(createProductDto, files);
-    }
-
-    @Post('upload')
     @UsePipes(new ValidationPipe({ transform: true }))
     async createProduct(@Req() req: FastifyRequest) {
         const parts = req.parts();
@@ -92,14 +85,22 @@ export class ProductsController {
             }
         }
 
+        
         const errors = await validate(createProductDto);
+
+        
         if (errors.length > 0) {
             const messages = errors.flatMap(error =>
-              error.constraints ? Object.values(error.constraints) : []
+                error.constraints ? Object.values(error.constraints) : []
             );
+            
+            console.log("messages", messages);
         
-            throw new BadRequestException(messages);
+            // Unir todos los mensajes en un solo string para evitar que NestJS los procese incorrectamente
+            const errorMessage = messages.join(", ");
+            throw new BadRequestException(errorMessage);
         }
+        
 
         return this.productsService.create(createProductDto, files);
     }
