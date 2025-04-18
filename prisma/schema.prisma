@@ -86,12 +86,22 @@ model Product {
   activeIngredient String? @db.VarChar(50)
   weight    String? @db.VarChar(50)
   volume    String? @db.VarChar(50)
+  
 
   category Category            @relation(fields: [categoryId], references: [id])
   batches  Batch[]
   sales    SaleProductClient[]
 
   ProductTag ProductTag[]
+  images ProductImage[]
+}
+
+model ProductImage{
+  id      String @id @default(uuid())
+  productId String
+  url      String @db.VarChar(200)
+
+  product Product @relation(fields: [productId], references: [id])
 }
 
 model Sale {

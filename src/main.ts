@@ -6,14 +6,17 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import fastifyCookie from '@fastify/cookie';
-import fastifySwagger from '@fastify/swagger'; // Importar fastify-swagger
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { fastifyMultipart } from '@fastify/multipart';
+
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter()
   );
+
+  await app.register(fastifyMultipart)
 
   const globalPrefix = 'api';
   const port = process.env.PORT || 3000;
@@ -56,6 +59,7 @@ async function bootstrap() {
     credentials: true,
   });
   
+
   await app.listen(port, '0.0.0.0');
 }
 

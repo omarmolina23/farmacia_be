@@ -2,16 +2,36 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+
+import { v4 as uuid } from 'uuid';
+
+type UploadedFile = {
+    filename: string;
+    buffer: Buffer;
+    mimetype: string;
+    size: number;
+}
 
 @Injectable()
 export class ProductsService {
 
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private cloudinaryService: CloudinaryService
+    ) { }
 
-    async create(createProductDto: CreateProductDto) {
-
+    async create(createProductDto: CreateProductDto, files: UploadedFile[]) {
         try {
             const { ProductTag, ...product } = createProductDto;
+
+            const allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+            const maxFileSize = 5 * 1024 * 1024; 
+            const maxFiles = 3;
+            let imageUrls: string[] = [];
+
+            console.log("Uploaded files", files);
+            console.log("ProductTag", ProductTag);
 
             const category = await this.prisma.category.findUnique({ where: { id: product.categoryId } });
 
@@ -26,11 +46,57 @@ export class ProductsService {
                 throw new NotFoundException('El precio debe ser mayor a 0');
             }
 
+            if(ProductTag){
+                for (const tag of ProductTag) {
+                    const tagFound = await this.prisma.tag.findUnique({ where: { id: tag } });
+                    if (!tagFound) {
+                        throw new NotFoundException('Etiqueta no encontrada');
+                    }
+                }
+            }
+
+            if(files){
+
+                console.log("Files received:", files); // Verifica que los archivos están llegando correctamente
+                if(files.length > maxFiles) {
+                    throw new NotFoundException('Se han subido demasiados archivos (máximo 3)');
+                }
+
+                for(const file of files) {
+                    if(!allowedFileTypes.includes(file.mimetype)) {
+                        throw new NotFoundException('Tipo de archivo no permitido (solo jpeg, png, jpg y webp)');
+                    }
+                    if(file.size > maxFileSize) {
+                        throw new NotFoundException('El tamaño del archivo es demasiado grande (máximo 5MB)');
+                    }
+                }
+
+                const currentDate = new Date();
+                const formattedDate = currentDate.toISOString().replace(/[-:]/g, '').split('.')[0]; // YYYYMMDD_HHMMSS
+
+                const uploadedImages = await Promise.all(
+                    files.map(file =>
+                        this.cloudinaryService.uploadFile({
+                            filename: `${product.name}_${product.categoryId}_${uuid()}`,
+                            buffer: file.buffer,
+                            mimetype: file.mimetype,
+                            size: file.size,
+                        } as Express.Multer.File)
+                    )
+                );
+
+                imageUrls = uploadedImages.map(img => img.secure_url);
+            }
+            
+
             return await this.prisma.product.create({
                 data: {
                     ...product,
                     ProductTag: {
                         create: ProductTag?.map((tagId) => ({ tag: { connect: { id: tagId } } })) || [],
+                    },
+                    images: {
+                        create: imageUrls?.map((url) => ({ url })),
                     },
                 }
             });
