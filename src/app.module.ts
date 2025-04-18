@@ -6,9 +6,10 @@ import { SupplierModule } from './supplier/supplier.module';
 import { ProductsModule } from './products/products.module';
 import { BatchModule } from './batch/batch.module';
 import { TagModule } from './tag/tag.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, CategoryModule, SupplierModule, ProductsModule, BatchModule, TagModule],
+  imports: [AuthModule, UsersModule, CategoryModule, SupplierModule, ProductsModule, BatchModule, TagModule, CloudinaryModule],
   controllers: [],
   providers: [],
 })
