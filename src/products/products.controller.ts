@@ -76,7 +76,10 @@ export class ProductsController {
         createProductDto.weight = body['weight'];
         createProductDto.volume = body['volume'];
 
+        console.log("body", body['ProductTag']);
+
         if (body['ProductTag']) {
+            console.log("body", body['ProductTag']);
             try {
               body['ProductTag'] = JSON.parse(body['ProductTag']);
               createProductDto.ProductTag = body['ProductTag'];
