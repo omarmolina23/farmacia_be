@@ -26,12 +26,9 @@ export class ProductsService {
             const { ProductTag, ...product } = createProductDto;
 
             const allowedFileTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-            const maxFileSize = 5 * 1024 * 1024; 
+            const maxFileSize = 5 * 1024 * 1024;
             const maxFiles = 3;
             let imageUrls: string[] = [];
-
-            console.log("Uploaded files", files);
-            console.log("ProductTag", ProductTag);
 
             const category = await this.prisma.category.findUnique({ where: { id: product.categoryId } });
 
@@ -42,11 +39,11 @@ export class ProductsService {
                 throw new NotFoundException('Categoria inactiva');
             }
 
-            if(product.price <= 0) {
+            if (product.price <= 0) {
                 throw new NotFoundException('El precio debe ser mayor a 0');
             }
 
-            if(ProductTag){
+            if (ProductTag) {
                 for (const tag of ProductTag) {
                     const tagFound = await this.prisma.tag.findUnique({ where: { id: tag } });
                     if (!tagFound) {
@@ -55,19 +52,16 @@ export class ProductsService {
                 }
             }
 
-            if(files){
-
-                console.log("Files received:", files, files.length, maxFiles); // Verifica que los archivos están llegando correctamente
-                if(files.length > maxFiles) {
-                    console.log("Hi")
+            if (files) {
+                if (files.length > maxFiles) {
                     throw new BadRequestException('Se han subido demasiados archivos (máximo 3)');
                 }
 
-                for(const file of files) {
-                    if(!allowedFileTypes.includes(file.mimetype)) {
+                for (const file of files) {
+                    if (!allowedFileTypes.includes(file.mimetype)) {
                         throw new BadRequestException('Tipo de archivo no permitido (solo jpeg, png, jpg y webp)');
                     }
-                    if(file.size > maxFileSize) {
+                    if (file.size > maxFileSize) {
                         throw new BadRequestException('El tamaño del archivo es demasiado grande (máximo 5MB)');
                     }
                 }
@@ -87,7 +81,7 @@ export class ProductsService {
 
                 imageUrls = uploadedImages.map(img => img.secure_url);
             }
-            
+
 
             return await this.prisma.product.create({
                 data: {
@@ -143,7 +137,7 @@ export class ProductsService {
                         tag: true,
                     },
                 },
-                images:{
+                images: {
                     select: {
                         url: true,
                     },
@@ -167,7 +161,7 @@ export class ProductsService {
                         tag: true,
                     },
                 },
-                images:{
+                images: {
                     select: {
                         url: true,
                     },
@@ -179,9 +173,9 @@ export class ProductsService {
     async update(id: string, updateProductDto: UpdateProductDto) {
         try {
 
-            const {ProductTag, ...product } = updateProductDto;
+            const { ProductTag, ...product } = updateProductDto;
 
-            if(product.categoryId){
+            if (product.categoryId) {
                 const category = await this.prisma.category.findUnique({ where: { id: product.categoryId } });
 
                 if (!category) {
@@ -191,7 +185,7 @@ export class ProductsService {
                     throw new NotFoundException('Categoria inactiva');
                 }
             }
-            
+
             const productFound = await this.prisma.product.findUnique({ where: { id } });
 
             if (!productFound) {
@@ -203,7 +197,7 @@ export class ProductsService {
                 data: {
                     ...product,
                     ProductTag: {
-                        deleteMany: {}, 
+                        deleteMany: {},
                         create: ProductTag?.map((tagId) => ({ tag: { connect: { id: tagId } } })) || [],
                     },
                 }

@@ -26,15 +26,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Roles } from 'src/auth/validators/roles.decorator';
-import { AnyFilesInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { Multer } from 'multer';
-import { ApiConsumes } from '@nestjs/swagger';
-import { ApiFileBody, MulterFile } from '@webundsoehne/nest-fastify-file-upload';
 import { FastifyRequest } from 'fastify';
 import { validate } from 'class-validator';
-
-
-
 
 @Controller('product')
 export class ProductsController {
@@ -64,8 +57,6 @@ export class ProductsController {
             }
         }
 
-        console.log("body final", body);
-        // Aquí tú decides si haces validaciones o lo transformas a un DTO
         const createProductDto = new CreateProductDto();
 
         createProductDto.name = body['name'];
@@ -77,39 +68,30 @@ export class ProductsController {
         createProductDto.weight = body['weight'];
         createProductDto.volume = body['volume'];
 
-        console.log("body", body['ProductTag']);
-
         if (body['ProductTag']) {
-            console.log("body", body['ProductTag']);
             try {
-              body['ProductTag'] = JSON.parse(body['ProductTag']);
-              createProductDto.ProductTag = body['ProductTag'];
+                body['ProductTag'] = JSON.parse(body['ProductTag']);
+                createProductDto.ProductTag = body['ProductTag'];
             } catch {
-              throw new BadRequestException('ProductTag must be a valid JSON array');
+                throw new BadRequestException('ProductTag must be a valid JSON array');
             }
         }
 
-        
+
         const errors = await validate(createProductDto);
 
-        
+
         if (errors.length > 0) {
             const messages = errors.flatMap(error =>
                 error.constraints ? Object.values(error.constraints) : []
             );
-            
-            console.log("messages", messages);
-        
-            // Unir todos los mensajes en un solo string para evitar que NestJS los procese incorrectamente
+
             const errorMessage = messages.join(", ");
             throw new BadRequestException(errorMessage);
         }
-        
 
         return this.productsService.create(createProductDto, files);
     }
-
-
 
     @Get()
     findAll() {
