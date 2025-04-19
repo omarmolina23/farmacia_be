@@ -64,6 +64,7 @@ export class ProductsController {
             }
         }
 
+        console.log("body final", body);
         // Aquí tú decides si haces validaciones o lo transformas a un DTO
         const createProductDto = new CreateProductDto();
 
