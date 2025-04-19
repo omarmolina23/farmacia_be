@@ -18,7 +18,7 @@ import { Roles } from 'src/auth/validators/roles.decorator';
 
 @Controller('category')
 export class CategoryController {
-  constructor(private categoryService: CategoryService) {}
+  constructor(private categoryService: CategoryService) { }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
@@ -39,7 +39,7 @@ export class CategoryController {
   @Get('search')
   search(
     @Query('query') query?: string,
-  ){
+  ) {
     return this.categoryService.findByName(query);
   }
 
