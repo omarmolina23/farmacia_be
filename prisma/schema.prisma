@@ -59,7 +59,9 @@ model Batch {
   productId      String
   supplierId     String
   expirationDate DateTime
+  entryDate      DateTime @default(now())
   status         Status   @default(ACTIVE)
+  isExpired Boolean @default(false)
   number_batch    String   @db.VarChar(50)
   amount        Int
   totalValue     Decimal @db.Decimal(10, 0) @default(0)
