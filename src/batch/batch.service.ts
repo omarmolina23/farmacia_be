@@ -1,158 +1,152 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Product } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateBatchDto } from './dto/create-batch.dto';
 import { UpdateBatchDto } from './dto/update-batch.dto';
 @Injectable()
 export class BatchService {
+  constructor(private prisma: PrismaService) {}
 
-    constructor(private prisma: PrismaService) { }
+  async create(createBatchDto: CreateBatchDto) {
+    try {
+      const { productId, supplierId, amount, expirationDate } = createBatchDto;
 
-    async create(createBatchDto: CreateBatchDto) {
+      const product = await this.validateProduct(productId);
+      await this.validateSupplier(supplierId);
+      this.validateExpirationDate(expirationDate);
+      this.validateAmount(amount);
 
-        try {
-            const { productId, supplierId, amount, expirationDate } = createBatchDto;
+      const totalValue = createBatchDto.amount * Number(product.price);
 
-            const product = await this.prisma.product.findUnique({ where: { id: productId } });
+      return await this.prisma.batch.create({
+        data: {
+          ...createBatchDto,
+          totalValue: totalValue,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 
-            if (!product) {
-                throw new NotFoundException('Producto no encontrado');
-            }
-            if (product.status === 'INACTIVE') {
-                throw new NotFoundException('Producto inactivo');
-            }
-            const supplier = await this.prisma.supplier.findUnique({ where: { id: supplierId } });
+  async findAll() {
+    return await this.prisma.batch.findMany();
+  }
 
-            if (!supplier) {
-                throw new NotFoundException('Proveedor no encontrado');
-            }
+  async findByNumberBatch(query: string) {
+    if (!query) {
+      return await this.prisma.batch.findMany();
+    }
+    return await this.prisma.batch.findMany({
+      where: {
+        number_batch: { contains: query, mode: 'insensitive' },
+      },
+    });
+  }
 
-            if (supplier.status === 'INACTIVE') {
-                throw new NotFoundException('Proveedor inactivo');
-            }
+  async findById(query: string) {
+    if (!query) {
+      return await this.prisma.batch.findMany();
+    }
+    return await this.prisma.batch.findUnique({
+      where: {
+        id: query,
+      },
+    });
+  }
 
-            const currentDate = new Date();
+  async update(id: string, updateBatchDto: UpdateBatchDto) {
+    try {
+      const { productId, supplierId, amount, expirationDate } = updateBatchDto;
+      const batch = await this.prisma.batch.findUnique({ where: { id } });
 
-            if (!expirationDate || expirationDate <= currentDate) {
-                throw new NotFoundException('La fecha de vencimiento debe ser en el futuro');
-            }
+      if (!batch) {
+        throw new NotFoundException('Lote no encontrado');
+      }
 
-            if(amount <= 0) {
-                throw new NotFoundException('La cantidad debe ser mayor a 0');
-            }
+      let totalValue = batch?.totalValue;
+      let product: Product | undefined;
 
-            const totalValue = createBatchDto.amount * Number(product.price);
+      if (productId) {
+        product = await this.validateProduct(productId);
+      }
 
-            return await this.prisma.batch.create({ 
-                data: {
-                    ...createBatchDto,
-                    totalValue: totalValue,
-                }
-            });
+      if (supplierId) {
+        await this.validateSupplier(supplierId);
+      }
 
-        } catch (error) {
-            throw error;
+      if (expirationDate !== undefined) {
+        this.validateExpirationDate(expirationDate);
+      }
+
+      if (amount !== undefined) {
+        this.validateAmount(amount);
+        if (product) {
+          totalValue = amount * Number(product.price);
         }
+      }
+
+      return await this.prisma.batch.update({
+        where: { id },
+        data: {
+          ...updateBatchDto,
+          totalValue: totalValue,
+        },
+      });
+    } catch (error) {
+      throw error;
     }
+  }
 
-    async findAll() {
-        return await this.prisma.batch.findMany();
+  async remove(id: string) {
+    try {
+      const batch = await this.prisma.batch.findUnique({ where: { id } });
+
+      if (!batch) {
+        throw new NotFoundException('Lote no encontrado');
+      }
+
+      return await this.prisma.batch.update({
+        where: { id },
+        data: { status: 'INACTIVE' },
+      });
+    } catch (error) {
+      throw error;
     }
+  }
 
-    async findByNumberBatch(query: string) {
-        if (!query) {
-            return await this.prisma.batch.findMany();
-        }
-        return await this.prisma.batch.findMany({
-            where: {
-                number_batch: { contains: query, mode: 'insensitive' },
-            },
-        });
+  private async validateProduct(productId: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+    });
+    if (!product) throw new NotFoundException('Producto no encontrado');
+    if (product.status === 'INACTIVE')
+      throw new NotFoundException('Producto inactivo');
+    return product;
+  }
+
+  private async validateSupplier(supplierId: string) {
+    const supplier = await this.prisma.supplier.findUnique({
+      where: { id: supplierId },
+    });
+    if (!supplier) throw new NotFoundException('Proveedor no encontrado');
+    if (supplier.status === 'INACTIVE')
+      throw new NotFoundException('Proveedor inactivo');
+    return supplier;
+  }
+
+  private validateExpirationDate(expirationDate: Date) {
+    const now = new Date();
+    if (!expirationDate || expirationDate <= now) {
+      throw new NotFoundException(
+        'La fecha de vencimiento debe ser en el futuro',
+      );
     }
+  }
 
-    async findById(query: string) {
-        if (!query) {
-            return await this.prisma.batch.findMany();
-        }
-        return await this.prisma.batch.findUnique({
-            where: {
-                id: query,
-            },
-        });
+  private validateAmount(amount: number) {
+    if (amount <= 0) {
+      throw new NotFoundException('La cantidad debe ser mayor a 0');
     }
-
-    
-
-    async update(id: string, updateBatchDto: UpdateBatchDto) {
-        try {
-
-            const { productId, supplierId, amount, expirationDate } = updateBatchDto;
-            const batch = await this.prisma.batch.findUnique({ where: { id } });
-            let totalValue = batch?.totalValue;
-
-            if (!batch) {
-                throw new NotFoundException('Lote no encontrado');
-            }
-
-            const product = await this.prisma.product.findUnique({ where: { id: productId } });
-
-            if (!product) {
-                throw new NotFoundException('Producto no encontrado');
-            }
-            if (product.status === 'INACTIVE') {
-                throw new NotFoundException('Producto inactivo');
-            }
-            const supplier = await this.prisma.supplier.findUnique({ where: { id: supplierId } });
-
-            if (!supplier) {
-                throw new NotFoundException('Proveedor no encontrado');
-            }
-
-            if (supplier.status === 'INACTIVE') {
-                throw new NotFoundException('Proveedor inactivo');
-            }
-
-            const currentDate = new Date();
-
-            if (expirationDate != undefined && expirationDate <= currentDate) {
-                throw new NotFoundException('La fecha de vencimiento debe ser en el futuro');
-            }
-
-            if(amount != undefined && amount <= 0) {
-                if(amount <= 0){
-                    throw new NotFoundException('La cantidad debe ser mayor a 0');
-                }
-                
-                totalValue = amount * Number(product.price);
-            }
-
-            return await this.prisma.batch.update({
-                where: { id },
-                data: {
-                    ...updateBatchDto,
-                    totalValue: totalValue,
-                }
-            });
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async remove(id: string) {
-        try {
-            const batch = await this.prisma.batch.findUnique({ where: { id } });
-
-            if (!batch) {
-                throw new NotFoundException('Lote no encontrado');
-            }
-
-            return await this.prisma.batch.update({
-                where: { id },
-                data: { status: 'INACTIVE' },
-            })
-
-        } catch (error) {
-            throw error;
-        }
-    }
-
+  }
 }
