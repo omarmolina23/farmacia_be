@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Product } from '@prisma/client';
+import { Product, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateBatchDto } from './dto/create-batch.dto';
 import { UpdateBatchDto } from './dto/update-batch.dto';
@@ -91,7 +91,7 @@ export class BatchService {
       if (amount !== undefined) {
         this.validateAmount(amount);
         if (product) {
-          totalValue = amount * Number(product.price);
+          totalValue = new Prisma.Decimal(amount).mul(new Prisma.Decimal(product.price));
         }
       }
 
