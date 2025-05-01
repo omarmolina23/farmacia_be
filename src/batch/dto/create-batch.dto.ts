@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, IsNumber, IsDate, IsEnum } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsNumber, IsDate, IsEnum, IsBoolean } from "class-validator";
 import { Type } from "class-transformer";
 
 export enum Status {
@@ -24,6 +24,10 @@ export class CreateBatchDto {
     @IsOptional()
     @IsEnum(Status)
     status?: Status
+
+    @IsOptional()
+    @IsBoolean()
+    isExpired?: boolean
 
     @IsNotEmpty()
     @IsString()
