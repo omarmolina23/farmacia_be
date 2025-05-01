@@ -87,7 +87,7 @@ export class BatchService {
 
             const { productId, supplierId, amount, expirationDate } = updateBatchDto;
             const batch = await this.prisma.batch.findUnique({ where: { id } });
-            const totalValue = batch?.totalValue;
+            let totalValue = batch?.totalValue;
 
             if (!batch) {
                 throw new NotFoundException('Lote no encontrado');
@@ -122,7 +122,7 @@ export class BatchService {
                     throw new NotFoundException('La cantidad debe ser mayor a 0');
                 }
                 
-                const totalValue = amount * Number(product.price);
+                totalValue = amount * Number(product.price);
             }
 
             return await this.prisma.batch.update({
