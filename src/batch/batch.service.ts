@@ -30,12 +30,19 @@ export class BatchService {
   }
 
   async findAll() {
-    return await this.prisma.batch.findMany();
+    return await this.prisma.batch.findMany({
+      include: {
+        product: true,
+        supplier: true,
+      },
+    });
   }
 
   async findByNumberBatch(query: string) {
     if (!query) {
-      return await this.prisma.batch.findMany();
+      return await this.prisma.batch.findMany({
+        include: { product: true, supplier: true },
+      });
     }
     return await this.prisma.batch.findMany({
       where: {
@@ -46,7 +53,9 @@ export class BatchService {
 
   async findById(query: string) {
     if (!query) {
-      return await this.prisma.batch.findMany();
+      return await this.prisma.batch.findMany({
+        include: { product: true, supplier: true },
+      });
     }
     return await this.prisma.batch.findUnique({
       where: {
