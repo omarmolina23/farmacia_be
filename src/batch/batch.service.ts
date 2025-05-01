@@ -64,6 +64,19 @@ export class BatchService {
     });
   }
 
+  async findByProductId(productId: string) {
+    const product = await this.prisma.product.findUnique({ where: { id: productId } });
+  
+    if (!product) {
+      throw new NotFoundException('Producto no encontrado');
+    }
+  
+    return await this.prisma.batch.findMany({
+      where: { productId },
+      include: { product: true, supplier: true },
+    });
+  }
+
   async update(id: string, updateBatchDto: UpdateBatchDto) {
     try {
       const { productId, supplierId, amount, expirationDate } = updateBatchDto;

@@ -50,6 +50,13 @@ export class BatchController {
 
     @UseGuards(AuthGuard, RolesGuard)
     @Roles('admin')
+    @Get('search/by-product')
+    findByProductId(@Query('productId') productId: string) {
+        return this.batchService.findByProductId(productId);
+    }
+
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles('admin')
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateBatchDto: UpdateBatchDto) {
         return this.batchService.update(id, updateBatchDto);
