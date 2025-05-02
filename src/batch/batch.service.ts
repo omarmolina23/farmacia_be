@@ -45,9 +45,9 @@ export class BatchService {
       });
     }
     return await this.prisma.batch.findMany({
-      where: {
-        number_batch: { contains: query, mode: 'insensitive' },
-      },
+      where: {number_batch: { contains: query, mode: 'insensitive' },},
+      orderBy: [{number_batch: 'asc'},],
+      include: { product: true, supplier: true },
     });
   }
 
@@ -58,9 +58,8 @@ export class BatchService {
       });
     }
     return await this.prisma.batch.findUnique({
-      where: {
-        id: query,
-      },
+      where: {id: query,},
+      include: { product: true, supplier: true },
     });
   }
 
@@ -73,6 +72,7 @@ export class BatchService {
   
     return await this.prisma.batch.findMany({
       where: { productId },
+      orderBy: [{number_batch: 'asc'},],
       include: { product: true, supplier: true },
     });
   }
