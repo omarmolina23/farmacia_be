@@ -33,6 +33,7 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/platform-fastify": "^11.0.11",
+    "@nestjs/schedule": "^6.0.0",
     "@nestjs/swagger": "^11.0.7",
     "@prisma/client": "^6.5.0",
     "@webundsoehne/nest-fastify-file-upload": "^2.3.1",

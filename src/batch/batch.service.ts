@@ -3,6 +3,8 @@ import { Product, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateBatchDto } from './dto/create-batch.dto';
 import { UpdateBatchDto } from './dto/update-batch.dto';
+import { Cron, CronExpression } from '@nestjs/schedule';
+
 @Injectable()
 export class BatchService {
   constructor(private prisma: PrismaService) {}
@@ -45,8 +47,8 @@ export class BatchService {
       });
     }
     return await this.prisma.batch.findMany({
-      where: {number_batch: { contains: query, mode: 'insensitive' },},
-      orderBy: [{number_batch: 'asc'},],
+      where: { number_batch: { contains: query, mode: 'insensitive' } },
+      orderBy: [{ number_batch: 'asc' }],
       include: { product: true, supplier: true },
     });
   }
@@ -58,21 +60,23 @@ export class BatchService {
       });
     }
     return await this.prisma.batch.findUnique({
-      where: {id: query,},
+      where: { id: query },
       include: { product: true, supplier: true },
     });
   }
 
   async findByProductId(productId: string) {
-    const product = await this.prisma.product.findUnique({ where: { id: productId } });
-  
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+    });
+
     if (!product) {
       throw new NotFoundException('Producto no encontrado');
     }
-  
+
     return await this.prisma.batch.findMany({
       where: { productId },
-      orderBy: [{number_batch: 'asc'},],
+      orderBy: [{ number_batch: 'asc' }],
       include: { product: true, supplier: true },
     });
   }
@@ -104,7 +108,9 @@ export class BatchService {
       if (amount !== undefined) {
         this.validateAmount(amount);
         if (product) {
-          totalValue = new Prisma.Decimal(amount).mul(new Prisma.Decimal(product.price));
+          totalValue = new Prisma.Decimal(amount).mul(
+            new Prisma.Decimal(product.price),
+          );
         }
       }
 
@@ -135,6 +141,31 @@ export class BatchService {
     } catch (error) {
       throw error;
     }
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async checkExpiredBatches() {
+    const now = new Date();
+    const expiredBatches = await this.prisma.batch.findMany({
+      where: {
+        expirationDate: {
+          lt: now,
+        },
+        isExpired: false,
+      },
+    });
+
+    for (const batch of expiredBatches) {
+      await this.prisma.batch.update({
+        where: { id: batch.id },
+        data: {
+          isExpired: true,
+          status: 'INACTIVE',
+        },
+      });
+    }
+
+    return `Se actualizaron ${expiredBatches.length} lotes expirados.`;
   }
 
   private async validateProduct(productId: string) {
