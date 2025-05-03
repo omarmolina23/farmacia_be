@@ -27,8 +27,6 @@ export class CategoryController {
     return this.categoryService.create(createCategoryDto);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles('admin')
   @Get()
   findAll() {
     return this.categoryService.findAll();
