@@ -11,19 +11,15 @@ export class BatchService {
 
   async create(createBatchDto: CreateBatchDto) {
     try {
-      const { productId, supplierId, amount, expirationDate } = createBatchDto;
+      const { productId, amount, purchaseValue, expirationDate } = createBatchDto;
 
-      const product = await this.validateProduct(productId);
-      await this.validateSupplier(supplierId);
+      this.validateProduct(productId);
       this.validateExpirationDate(expirationDate);
       this.validateAmount(amount);
-
-      const totalValue = createBatchDto.amount * Number(product.price);
 
       return await this.prisma.batch.create({
         data: {
           ...createBatchDto,
-          totalValue: totalValue,
         },
       });
     } catch (error) {
@@ -35,7 +31,6 @@ export class BatchService {
     return await this.prisma.batch.findMany({
       include: {
         product: true,
-        supplier: true,
       },
     });
   }
@@ -43,25 +38,25 @@ export class BatchService {
   async findByNumberBatch(query: string) {
     if (!query) {
       return await this.prisma.batch.findMany({
-        include: { product: true, supplier: true },
+        include: { product: true, },
       });
     }
     return await this.prisma.batch.findMany({
       where: { number_batch: { contains: query, mode: 'insensitive' } },
       orderBy: [{ number_batch: 'asc' }],
-      include: { product: true, supplier: true },
+      include: { product: true, },
     });
   }
 
   async findById(query: string) {
     if (!query) {
       return await this.prisma.batch.findMany({
-        include: { product: true, supplier: true },
+        include: { product: true, },
       });
     }
     return await this.prisma.batch.findUnique({
       where: { id: query },
-      include: { product: true, supplier: true },
+      include: { product: true, },
     });
   }
 
@@ -77,28 +72,23 @@ export class BatchService {
     return await this.prisma.batch.findMany({
       where: { productId },
       orderBy: [{ number_batch: 'asc' }],
-      include: { product: true, supplier: true },
+      include: { product: true, },
     });
   }
 
   async update(id: string, updateBatchDto: UpdateBatchDto) {
     try {
-      const { productId, supplierId, amount, expirationDate } = updateBatchDto;
+      const { productId, amount, expirationDate } = updateBatchDto;
       const batch = await this.prisma.batch.findUnique({ where: { id } });
 
       if (!batch) {
         throw new NotFoundException('Lote no encontrado');
       }
 
-      let totalValue = batch?.totalValue;
       let product: Product | undefined;
 
       if (productId) {
         product = await this.validateProduct(productId);
-      }
-
-      if (supplierId) {
-        await this.validateSupplier(supplierId);
       }
 
       if (expirationDate !== undefined) {
@@ -107,18 +97,12 @@ export class BatchService {
 
       if (amount !== undefined) {
         this.validateAmount(amount);
-        if (product) {
-          totalValue = new Prisma.Decimal(amount).mul(
-            new Prisma.Decimal(product.price),
-          );
-        }
       }
 
       return await this.prisma.batch.update({
         where: { id },
         data: {
           ...updateBatchDto,
-          totalValue: totalValue,
         },
       });
     } catch (error) {
@@ -176,16 +160,6 @@ export class BatchService {
     if (product.status === 'INACTIVE')
       throw new NotFoundException('Producto inactivo');
     return product;
-  }
-
-  private async validateSupplier(supplierId: string) {
-    const supplier = await this.prisma.supplier.findUnique({
-      where: { id: supplierId },
-    });
-    if (!supplier) throw new NotFoundException('Proveedor no encontrado');
-    if (supplier.status === 'INACTIVE')
-      throw new NotFoundException('Proveedor inactivo');
-    return supplier;
   }
 
   private validateExpirationDate(expirationDate: Date) {
