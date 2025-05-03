@@ -13,10 +13,6 @@ export class CreateBatchDto {
     productId: string
 
     @IsNotEmpty()
-    @IsString()
-    supplierId: string
-
-    @IsNotEmpty()
     @Type(() => Date)
     @IsDate()
     expirationDate: Date
@@ -36,6 +32,10 @@ export class CreateBatchDto {
     @IsNotEmpty()
     @IsNumber()
     amount: number
+
+    @IsNotEmpty()
+    @IsNumber()
+    purchaseValue: number;
 }
 
 
