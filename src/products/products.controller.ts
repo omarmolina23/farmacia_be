@@ -23,11 +23,33 @@ import {
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ImagesDto } from './dto/images.dto';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Roles } from 'src/auth/validators/roles.decorator';
 import { FastifyRequest } from 'fastify';
 import { validate } from 'class-validator';
+
+function extractImagesFromBody(body: Record<string, any>) {
+    const images: Record<string, any>[] = [];
+
+    for (const key in body) {
+        const match = key.match(/^images\[(\d+)]\[(\w+)]$/);
+        if (match) {
+            const index = parseInt(match[1], 10);
+            const prop = match[2];
+
+            if (!images[index]) images[index] = {};
+            images[index][prop] = body[key];
+        }
+    }
+
+    return images.map((img) => ({
+        data_url: img.data_url || '', // Ensure 'data_url' is included or provide a default value
+        isExisting: img.isExisting === 'true',
+        id: img.id || '', // Ensure 'id' is included or provide a default value
+    }));
+}
 
 @Controller('product')
 export class ProductsController {
@@ -61,8 +83,8 @@ export class ProductsController {
 
         createProductDto.name = body['name'];
         createProductDto.description = body['description'];
-        createProductDto.price = parseFloat(body['price']);
         createProductDto.categoryId = body['categoryId'];
+        createProductDto.supplierId = body['supplierId'];
         createProductDto.concentration = body['concentration'];
         createProductDto.activeIngredient = body['activeIngredient'];
         createProductDto.weight = body['weight'];
@@ -113,8 +135,67 @@ export class ProductsController {
     @UseGuards(AuthGuard, RolesGuard)
     @Roles('admin')
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-        return this.productsService.update(id, updateProductDto);
+    async update(
+        @Req() req: FastifyRequest,
+        @Param('id') id: string
+    
+    ) {
+        const parts = req.parts();
+
+        const files: { filename: string; buffer: Buffer, mimetype: string, size: number }[] = [];
+        const body = {};
+
+        for await (const part of parts) {
+            if (part.type === 'file') {
+                const buffer = await part.toBuffer();
+                files.push({
+                    filename: part.filename,
+                    buffer,
+                    mimetype: part.mimetype,
+                    size: buffer.length,
+                });
+            } else {
+                body[part.fieldname] = part.value;
+            }
+        }
+
+        const updateProductDto = new UpdateProductDto();
+        const imagesDto = new ImagesDto();
+
+        updateProductDto.name = body['name'];
+        updateProductDto.description = body['description'];
+        updateProductDto.categoryId = body['categoryId'];
+        updateProductDto.supplierId = body['supplierId'];
+        updateProductDto.concentration = body['concentration'];
+        updateProductDto.activeIngredient = body['activeIngredient'];
+        updateProductDto.weight = body['weight'];
+        updateProductDto.volume = body['volume'];
+
+        imagesDto.images = extractImagesFromBody(body);
+
+        if (body['ProductTag']) {
+            try {
+                body['ProductTag'] = JSON.parse(body['ProductTag']);
+                updateProductDto.ProductTag = body['ProductTag'];
+            } catch {
+                throw new BadRequestException('ProductTag must be a valid JSON array');
+            }
+        }
+
+        const errors = await validate(updateProductDto);
+
+        if (errors.length > 0) {
+            const messages = errors.flatMap(error =>
+                error.constraints ? Object.values(error.constraints) : []
+            );
+
+            const errorMessage = messages.join(", ");
+            throw new BadRequestException(errorMessage);
+        }
+
+        const images = extractImagesFromBody(body);
+
+        return this.productsService.update(id, updateProductDto, files, imagesDto );
     }
 
     @UseGuards(AuthGuard, RolesGuard)

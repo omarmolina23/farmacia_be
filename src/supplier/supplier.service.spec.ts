@@ -1,10 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SupplierService } from './supplier.service';
-import { PrismaService } from '../../prisma/prisma.service';
-import { CreateSupplierDto } from './dto/create.supplier';
-import { UpdateSupplierDto } from './dto/update.supplier';
-import { Status } from './dto/create.supplier';
-import { NotFoundException, ConflictException } from '@nestjs/common';
+import { UsersService } from 'src/users/users.service';
+import { PrismaService } from 'prisma/prisma.service';
+import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
+import { NotFoundException } from '@nestjs/common';
+import { Status } from '@prisma/client';
 
 describe('SupplierService', () => {
   let supplierService: SupplierService;
@@ -52,18 +51,31 @@ describe('SupplierService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        SupplierService,
-        { provide: PrismaService, useValue: mockPrismaService },
+        UsersService,
+        { provide: PrismaService, useValue: mockDeep<PrismaService>() },
       ],
     }).compile();
 
-    supplierService = module.get<SupplierService>(SupplierService);
-    prismaService = module.get<PrismaService>(PrismaService);
+    service = module.get<UsersService>(UsersService);
+    prismaMock = module.get(PrismaService);
   });
 
-  it('should be defined', () => {
-    expect(supplierService).toBeDefined();
+  it('debería estar definido', () => {
+    expect(service).toBeDefined();
   });
+
+  const mockUser = {
+    id: '1',
+    name: 'John Doe',
+    phone: '1234567890',
+    email: 'john@example.com',
+    password: 'hashedPassword',
+    birthdate: new Date('1990-01-01'),
+    registrationDate: new Date(),
+    status: Status.INACTIVE,
+    isAdmin: false,
+    isEmployee: true,
+  };
 
   describe('create', () => {
     it('should create a supplier', async () => {

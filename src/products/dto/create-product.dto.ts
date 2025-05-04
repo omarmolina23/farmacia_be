@@ -16,10 +16,6 @@ export class CreateProductDto {
     @IsString()
     description: string;
 
-    @IsNotEmpty()
-    @IsNumber()
-    price: number;
-
     @IsOptional()
     @IsEnum(Status)
     status?: Status;
@@ -27,6 +23,10 @@ export class CreateProductDto {
     @IsNotEmpty()
     @IsString()
     categoryId: string;
+
+    @IsNotEmpty()
+    @IsString()
+    supplierId: string;
 
     @IsOptional()
     @IsString()

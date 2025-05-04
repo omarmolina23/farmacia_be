@@ -51,6 +51,8 @@ model Supplier {
   phone   String  @db.VarChar(20)
   email   String  @unique @db.VarChar(50)
   status  Status  @default(ACTIVE)
+
+  Product Product[]
 }
 
 model Batch {
@@ -78,9 +80,9 @@ model Product {
   id         String  @id @default(uuid())
   name       String  @db.VarChar(100)
   description String? @db.VarChar(200)
-  price      Decimal
   status     Status  @default(ACTIVE)
   categoryId String
+  supplierId String 
   concentration String? @db.VarChar(50)
   activeIngredient String? @db.VarChar(50)
   weight    String? @db.VarChar(50)
@@ -88,6 +90,7 @@ model Product {
   
 
   category Category            @relation(fields: [categoryId], references: [id])
+  supplier Supplier            @relation(fields: [supplierId], references: [id])
   batches  Batch[]
   sales    SaleProductClient[]
 
