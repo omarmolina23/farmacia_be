@@ -5,28 +5,7 @@ import streamifier from 'streamifier';
 
 @Injectable()
 export class CloudinaryService {
-
-    /*
-    uploadFile(file: Express.Multer.File): Promise<CloudinaryResponse> {
-        console.log('Uploading file to Cloudinary:', file);
-        return new Promise<CloudinaryResponse>((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream(
-                (error, result) => {
-                    if (error) return reject(error);
-                    if (result) {
-                        resolve(result);
-                    } else {
-                        reject(new Error('Upload result is undefined'));
-                    }
-                },
-            );
-
-            streamifier.createReadStream(file.buffer).pipe(uploadStream);
-        });
-    }*/
-
         async uploadFile(file: Express.Multer.File): Promise<CloudinaryResponse> {
-            console.log('Uploading file to Cloudinary:', file);
             return new Promise<CloudinaryResponse>((resolve, reject) => {
               cloudinary.uploader.upload(
                 // Aquí simplemente pasamos el buffer
