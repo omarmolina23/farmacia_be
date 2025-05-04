@@ -195,83 +195,78 @@ export class ProductsService {
     }
 
     async findFilteredProducts(
-        category?: string,
-        tag?: string[],
-        supplier?: string,
+        categories?: string[],
+        tags?: string[],
+        suppliers?: string[],
         minPrice?: number,
         maxPrice?: number,
-        name?: string, // <--- nuevo parámetro
+        name?: string,
     ) {
-        try {
-            const filters: any = {
-                status: 'ACTIVE',
-            };
-
-            if (minPrice !== undefined || maxPrice !== undefined) {
-                filters.price = {};
-                if (minPrice !== undefined) filters.price.gte = minPrice;
-                if (maxPrice !== undefined) filters.price.lte = maxPrice;
-            }
-
-            if (category) {
-                filters.category = {
-                    name: {
-                        contains: category,
-                        mode: 'insensitive',
-                    },
-                };
-            }
-
-            if (tag && tag.length > 0) {
-                filters.ProductTag = {
-                    some: {
-                        tag: {
-                            name: {
-                                in: tag,
-                            },
-                        },
-                    },
-                };
-            }
-
-            if (supplier) {
-                filters.supplier = {
-                    name: {
-                        contains: supplier,
-                        mode: 'insensitive',
-                    },
-                };
-            }
-            
-
-            if (name) {
-                filters.name = {
-                    contains: name,
+        const filters: any = {
+            status: 'ACTIVE',
+        };
+    
+        if (minPrice !== undefined || maxPrice !== undefined) {
+            filters.price = {};
+            if (minPrice !== undefined) filters.price.gte = minPrice;
+            if (maxPrice !== undefined) filters.price.lte = maxPrice;
+        }
+    
+        if (categories && categories.length > 0) {
+            filters.category = {
+                name: {
+                    in: categories,
                     mode: 'insensitive',
-                };
-            }
-
-            return await this.prisma.product.findMany({
-                where: filters,
-                include: {
-                    category: true,
-                    ProductTag: {
-                        select: {
-                            tag: true,
-                        },
-                    },
-                    images: {
-                        select: {
-                            url: true,
+                },
+            };
+        }
+    
+        if (tags && tags.length > 0) {
+            filters.ProductTag = {
+                some: {
+                    tag: {
+                        name: {
+                            in: tags,
                         },
                     },
                 },
-            });
-        } catch (error) {
-            throw error;
+            };
         }
+    
+        if (suppliers && suppliers.length > 0) {
+            filters.supplier = {
+                name: {
+                    in: suppliers,
+                    mode: 'insensitive',
+                },
+            };
+        }
+    
+        if (name) {
+            filters.name = {
+                contains: name,
+                mode: 'insensitive',
+            };
+        }
+    
+        return this.prisma.product.findMany({
+            where: filters,
+            include: {
+                category: true,
+                ProductTag: {
+                    select: {
+                        tag: true,
+                    },
+                },
+                images: {
+                    select: {
+                        url: true,
+                    },
+                },
+            },
+        });
     }
-
+    
     async update(id: string, updateProductDto: UpdateProductDto, files: UploadedFile[], images: ImagesDto) {
         try {
 
