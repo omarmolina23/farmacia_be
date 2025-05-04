@@ -235,17 +235,14 @@ export class ProductsService {
             }
 
             if (supplier) {
-                filters.batches = {
-                    some: {
-                        supplier: {
-                            name: {
-                                contains: supplier,
-                                mode: 'insensitive',
-                            },
-                        },
+                filters.supplier = {
+                    name: {
+                        contains: supplier,
+                        mode: 'insensitive',
                     },
                 };
             }
+            
 
             if (name) {
                 filters.name = {
