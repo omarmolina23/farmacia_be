@@ -196,11 +196,10 @@ export class ProductsService {
 
     async findFilteredProducts(
         categories?: string[],
-        tags?: string[],
         suppliers?: string[],
         minPrice?: number,
         maxPrice?: number,
-        name?: string,
+        query?: string,
     ) {
         const filters: any = {
             status: 'ACTIVE',
@@ -221,18 +220,6 @@ export class ProductsService {
             };
         }
     
-        if (tags && tags.length > 0) {
-            filters.ProductTag = {
-                some: {
-                    tag: {
-                        name: {
-                            in: tags,
-                        },
-                    },
-                },
-            };
-        }
-    
         if (suppliers && suppliers.length > 0) {
             filters.supplier = {
                 name: {
@@ -242,11 +229,27 @@ export class ProductsService {
             };
         }
     
-        if (name) {
-            filters.name = {
-                contains: name,
-                mode: 'insensitive',
-            };
+        if (query) {
+            filters.OR = [
+                {
+                    name: {
+                        contains: query,
+                        mode: 'insensitive',
+                    },
+                },
+                {
+                    ProductTag: {
+                        some: {
+                            tag: {
+                                name: {
+                                    contains: query,
+                                    mode: 'insensitive',
+                                },
+                            },
+                        },
+                    },
+                },
+            ];
         }
     
         return this.prisma.product.findMany({
@@ -266,6 +269,7 @@ export class ProductsService {
             },
         });
     }
+    
     
     async update(id: string, updateProductDto: UpdateProductDto, files: UploadedFile[], images: ImagesDto) {
         try {

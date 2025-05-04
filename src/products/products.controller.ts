@@ -124,23 +124,20 @@ export class ProductsController {
     @Get('filter')
 async filterProducts(
     @Query('category') category?: string,
-    @Query('tag') tag?: string,
     @Query('supplier') supplier?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
-    @Query('name') name?: string
+    @Query('query') query?: string
 ) {
-    const tagArray = tag ? tag.split(',') : [];
     const categoryArray = category ? category.split(',') : [];
     const supplierArray = supplier ? supplier.split(',') : [];
 
     return this.productsService.findFilteredProducts(
         categoryArray,
-        tagArray,
         supplierArray,
         minPrice ? Number(minPrice) : undefined,
         maxPrice ? Number(maxPrice) : undefined,
-        name
+        query
     );
 }
 
