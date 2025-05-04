@@ -28,6 +28,10 @@ export class CreateProductDto {
     @IsString()
     supplierId: string;
 
+    @IsNotEmpty()
+    @IsNumber()
+    price: number;
+
     @IsOptional()
     @IsString()
     concentration?: string;

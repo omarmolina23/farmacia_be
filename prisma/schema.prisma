@@ -83,6 +83,7 @@ model Product {
   status     Status  @default(ACTIVE)
   categoryId String
   supplierId String 
+  price Decimal @default(0)
   concentration String? @db.VarChar(50)
   activeIngredient String? @db.VarChar(50)
   weight    String? @db.VarChar(50)
