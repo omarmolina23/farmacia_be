@@ -139,8 +139,6 @@ export class ProductsController {
         );
     }
 
-    @UseGuards(AuthGuard, RolesGuard)
-    @Roles('admin')
     @Get('search')
     findByNameOrId(@Query('query') query?: string) {
         return this.productsService.findByNameOrId(query);
