@@ -27,14 +27,12 @@ export class SupplierController {
     return this.supplierService.create(createSupplierDto);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @Get()
   findAll() {
     return this.supplierService.findAll();
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @Get('search')
   search(

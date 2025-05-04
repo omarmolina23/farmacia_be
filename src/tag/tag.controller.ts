@@ -28,8 +28,7 @@ export class TagController {
     create(@Body() createTagDto: CreateTagDto) {
         return this.tagService.create(createTagDto);
     }
-
-    @UseGuards(AuthGuard, RolesGuard)
+    
     @Roles('admin')
     @Get()
     findAll() {
