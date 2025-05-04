@@ -128,6 +128,7 @@ export class ProductsController {
         @Query('supplier') supplier?: string,
         @Query('minPrice') minPrice?: string,
         @Query('maxPrice') maxPrice?: string,
+        @Query('name') name?: string
     ) {
         const tagArray = tag ? tag.split(',') : [];
         return this.productsService.findFilteredProducts(
@@ -136,6 +137,7 @@ export class ProductsController {
             supplier,
             minPrice ? Number(minPrice) : undefined,
             maxPrice ? Number(maxPrice) : undefined,
+            name
         );
     }
 
