@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Product, Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateBatchDto } from './dto/create-batch.dto';
@@ -11,11 +11,22 @@ export class BatchService {
 
   async create(createBatchDto: CreateBatchDto) {
     try {
-      const { productId, amount, purchaseValue, expirationDate } = createBatchDto;
+      const { productId, amount, number_batch, expirationDate } =
+        createBatchDto;
 
       this.validateProduct(productId);
       this.validateExpirationDate(expirationDate);
       this.validateAmount(amount);
+
+      const existingBatch = await this.prisma.batch.findFirst({
+        where: { number_batch },
+      });
+
+      if (existingBatch) {
+        throw new BadRequestException(
+          `El número de lote "${number_batch}" ya existe.`,
+        );
+      }
 
       return await this.prisma.batch.create({
         data: {
@@ -38,25 +49,25 @@ export class BatchService {
   async findByNumberBatch(query: string) {
     if (!query) {
       return await this.prisma.batch.findMany({
-        include: { product: true, },
+        include: { product: true },
       });
     }
     return await this.prisma.batch.findMany({
       where: { number_batch: { contains: query, mode: 'insensitive' } },
       orderBy: [{ number_batch: 'asc' }],
-      include: { product: true, },
+      include: { product: true },
     });
   }
 
   async findById(query: string) {
     if (!query) {
       return await this.prisma.batch.findMany({
-        include: { product: true, },
+        include: { product: true },
       });
     }
     return await this.prisma.batch.findUnique({
       where: { id: query },
-      include: { product: true, },
+      include: { product: true },
     });
   }
 
@@ -72,7 +83,7 @@ export class BatchService {
     return await this.prisma.batch.findMany({
       where: { productId },
       orderBy: [{ number_batch: 'asc' }],
-      include: { product: true, },
+      include: { product: true },
     });
   }
 

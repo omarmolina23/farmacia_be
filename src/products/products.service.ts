@@ -49,6 +49,16 @@ export class ProductsService {
             throw new BadRequestException('El precio no puede ser negativo');
         }
 
+        const existingProduct = await this.prisma.product.findFirst({
+            where: {
+                name: product.name,
+            },
+        });
+        
+        if (existingProduct) {
+            throw new BadRequestException('Ya existe un producto con ese nombre');
+        }
+
         if (ProductTag) {
             for (const tag of ProductTag) {
                 const tagFound = await this.prisma.tag.findUnique({ where: { id: tag } });
@@ -101,7 +111,7 @@ export class ProductsService {
 
             const { ProductTag, ...product } = createProductDto;
 
-            this.validateProduct(product, ProductTag);
+            await this.validateProduct(product, ProductTag);
 
             const imageUrls = await this.uploadImagesProduct(product, files);
 
