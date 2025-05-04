@@ -85,6 +85,7 @@ export class ProductsController {
         createProductDto.description = body['description'];
         createProductDto.categoryId = body['categoryId'];
         createProductDto.supplierId = body['supplierId'];
+        createProductDto.price = Number(body['price']);
         createProductDto.concentration = body['concentration'];
         createProductDto.activeIngredient = body['activeIngredient'];
         createProductDto.weight = body['weight'];
@@ -120,6 +121,24 @@ export class ProductsController {
         return this.productsService.findAll();
     }
 
+    @Get('filter')
+    async filterProducts(
+        @Query('category') category?: string,
+        @Query('tag') tag?: string,
+        @Query('supplier') supplier?: string,
+        @Query('minPrice') minPrice?: string,
+        @Query('maxPrice') maxPrice?: string,
+    ) {
+        const tagArray = tag ? tag.split(',') : [];
+        return this.productsService.findFilteredProducts(
+            category,
+            tagArray,
+            supplier,
+            minPrice ? Number(minPrice) : undefined,
+            maxPrice ? Number(maxPrice) : undefined,
+        );
+    }
+
     @UseGuards(AuthGuard, RolesGuard)
     @Roles('admin')
     @Get('search')
@@ -138,7 +157,7 @@ export class ProductsController {
     async update(
         @Req() req: FastifyRequest,
         @Param('id') id: string
-    
+
     ) {
         const parts = req.parts();
 
@@ -166,6 +185,7 @@ export class ProductsController {
         updateProductDto.description = body['description'];
         updateProductDto.categoryId = body['categoryId'];
         updateProductDto.supplierId = body['supplierId'];
+        updateProductDto.price = Number(body['price']);
         updateProductDto.concentration = body['concentration'];
         updateProductDto.activeIngredient = body['activeIngredient'];
         updateProductDto.weight = body['weight'];
@@ -195,7 +215,7 @@ export class ProductsController {
 
         const images = extractImagesFromBody(body);
 
-        return this.productsService.update(id, updateProductDto, files, imagesDto );
+        return this.productsService.update(id, updateProductDto, files, imagesDto);
     }
 
     @UseGuards(AuthGuard, RolesGuard)

@@ -7,6 +7,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 import { v4 as uuid } from 'uuid';
 import { validate } from 'class-validator';
+import { TagController } from 'src/tag/tag.controller';
 
 type UploadedFile = {
     filename: string;
@@ -42,6 +43,10 @@ export class ProductsService {
         }
         if (supplier.status === 'INACTIVE') {
             throw new NotFoundException('Proveedor inactivo');
+        }
+
+        if(product.price <= 0) {
+            throw new BadRequestException('El precio no puede ser negativo');
         }
 
         if (ProductTag) {
@@ -189,6 +194,82 @@ export class ProductsService {
         });
     }
 
+    async findFilteredProducts(
+        
+        category?: string,
+        tag?: string[],
+        supplier?: string,
+        minPrice?: number,
+        maxPrice?: number,
+      ) {
+
+        try {
+            const filters: any = {
+                status: 'ACTIVE',
+              };
+          
+              if (minPrice !== undefined || maxPrice !== undefined) {
+                filters.price = {};
+                if (minPrice !== undefined) filters.price.gte = minPrice;
+                if (maxPrice !== undefined) filters.price.lte = maxPrice;
+              }
+          
+              if (category) {
+                filters.category = {
+                  name: {
+                    contains: category,
+                    mode: 'insensitive',
+                  },
+                };
+              }
+          
+              if (tag && tag.length > 0) {
+                filters.ProductTag = {
+                  some: {
+                    tag: {
+                      name: {
+                        in: tag,
+                      },
+                    },
+                  },
+                };
+              }
+          
+              if (supplier) {
+                filters.batches = {
+                  some: {
+                    supplier: {
+                      name: {
+                        contains: supplier,
+                        mode: 'insensitive',
+                      },
+                    },
+                  },
+                };
+              }
+              
+              return await this.prisma.product.findMany({
+                where: filters,
+                include: {
+                  category: true,
+                  ProductTag: {
+                    select: {
+                      tag: true,
+                    },
+                  },
+                  images: {
+                    select: {
+                      url: true,
+                    },
+                  },
+                },
+              });
+        } catch (error) {
+            throw error;
+        }
+        
+      }
+
     async update(id: string, updateProductDto: UpdateProductDto, files: UploadedFile[], images: ImagesDto) {
         try {
 
@@ -226,26 +307,26 @@ export class ProductsService {
             const productImageCreates = newImageUrls.map((url) => ({
                 url,
                 productId: id,
-              }));
-          
-              if (productImageCreates.length > 0) {
+            }));
+
+            if (productImageCreates.length > 0) {
                 await this.prisma.productImage.createMany({
-                  data: productImageCreates,
+                    data: productImageCreates,
                 });
-              }
-          
-              return await this.prisma.product.update({
+            }
+
+            return await this.prisma.product.update({
                 where: { id },
                 data: {
-                  ...product,
-                  ProductTag: {
-                    deleteMany: {},
-                    create: ProductTag?.map((tagId) => ({
-                      tag: { connect: { id: tagId } }
-                    })) || [],
-                  },
+                    ...product,
+                    ProductTag: {
+                        deleteMany: {},
+                        create: ProductTag?.map((tagId) => ({
+                            tag: { connect: { id: tagId } }
+                        })) || [],
+                    },
                 },
-              });
+            });
         } catch (error) {
             throw error;
         }
