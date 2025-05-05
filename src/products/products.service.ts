@@ -16,9 +16,6 @@ type UploadedFile = {
     size: number;
 }
 
-
-
-
 @Injectable()
 export class ProductsService {
 
@@ -47,16 +44,6 @@ export class ProductsService {
 
         if (product.price <= 0) {
             throw new BadRequestException('El precio no puede ser negativo');
-        }
-
-        const existingProduct = await this.prisma.product.findFirst({
-            where: {
-                name: product.name,
-            },
-        });
-        
-        if (existingProduct) {
-            throw new BadRequestException('Ya existe un producto con ese nombre');
         }
 
         if (ProductTag) {
@@ -286,7 +273,7 @@ export class ProductsService {
 
             const { ProductTag, ...product } = updateProductDto;
 
-            this.validateProduct(product, ProductTag);
+            await this.validateProduct(product, ProductTag);
 
             const newImageUrls = await this.uploadImagesProduct(product, files);
 
