@@ -7,10 +7,11 @@ import { SupplierModule } from './supplier/supplier.module';
 import { ProductsModule } from './products/products.module';
 import { BatchModule } from './batch/batch.module';
 import { TagModule } from './tag/tag.module';
+import { ClientModule } from './client/client.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, CategoryModule, SupplierModule, ProductsModule, BatchModule, TagModule, CloudinaryModule, ScheduleModule.forRoot()],
+  imports: [AuthModule, UsersModule, CategoryModule, SupplierModule, ProductsModule, BatchModule, TagModule, ClientModule, CloudinaryModule, ScheduleModule.forRoot()],
   controllers: [],
   providers: [],
 })
