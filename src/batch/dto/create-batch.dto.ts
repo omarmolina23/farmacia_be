@@ -33,9 +33,9 @@ export class CreateBatchDto {
     @IsNumber()
     amount: number
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsNumber()
-    available_amount: number
+    available_amount?: number
 
     @IsNotEmpty()
     @IsNumber()

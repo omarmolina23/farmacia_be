@@ -7,16 +7,21 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class BatchService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createBatchDto: CreateBatchDto) {
     try {
-      const { productId, amount, number_batch, expirationDate } =
+      const { productId, amount, available_amount, number_batch, expirationDate } =
         createBatchDto;
 
       this.validateProduct(productId);
       this.validateExpirationDate(expirationDate);
       this.validateAmount(amount);
+
+      if(available_amount) {
+        this.validateAmount(available_amount, 'disponible');
+        this.validateAvailableAmount(available_amount, amount);
+      }
 
       const existingBatch = await this.prisma.batch.findFirst({
         where: { number_batch },
@@ -31,6 +36,7 @@ export class BatchService {
       return await this.prisma.batch.create({
         data: {
           ...createBatchDto,
+          available_amount: amount,
         },
       });
     } catch (error) {
@@ -89,7 +95,7 @@ export class BatchService {
 
   async update(id: string, updateBatchDto: UpdateBatchDto) {
     try {
-      const { productId, amount, expirationDate } = updateBatchDto;
+      const { productId, amount, available_amount, expirationDate } = updateBatchDto;
       const batch = await this.prisma.batch.findUnique({ where: { id } });
 
       if (!batch) {
@@ -109,6 +115,16 @@ export class BatchService {
       if (amount !== undefined) {
         this.validateAmount(amount);
       }
+
+      if (available_amount !== undefined) {
+        this.validateAmount(available_amount, 'disponible');
+      }
+
+      const finalAvailable = available_amount ?? batch.available_amount;
+      const finalAmount = amount ?? batch.amount;
+
+      this.validateAvailableAmount(finalAvailable, finalAmount);
+
 
       return await this.prisma.batch.update({
         where: { id },
@@ -182,9 +198,17 @@ export class BatchService {
     }
   }
 
-  private validateAmount(amount: number) {
+  private validateAmount(amount: number, string?: string) {
     if (amount <= 0) {
-      throw new NotFoundException('La cantidad debe ser mayor a 0');
+      throw new NotFoundException(`La cantidad ${string || ''} debe ser mayor a 0`);
     }
   }
+
+  private validateAvailableAmount(available_amount: number, amount: number) {
+    if (available_amount > amount) {
+      throw new NotFoundException('La cantidad disponible debe ser menor o igual a la cantidad comprada');
+    }
+  }
+
+
 }
