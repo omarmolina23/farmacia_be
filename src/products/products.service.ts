@@ -194,6 +194,7 @@ export class ProductsService {
     async findFilteredProducts(
         categories?: string[],
         suppliers?: string[],
+        tags?: string[],
         minPrice?: number,
         maxPrice?: number,
         query?: string,
@@ -222,6 +223,19 @@ export class ProductsService {
                 name: {
                     in: suppliers,
                     mode: 'insensitive',
+                },
+            };
+        }
+
+        if (tags && tags.length > 0) {
+            filters.ProductTag = {
+                some: {
+                    tag: {
+                        name: {
+                            in: tags,
+                            mode: 'insensitive',
+                        },
+                    },
                 },
             };
         }
