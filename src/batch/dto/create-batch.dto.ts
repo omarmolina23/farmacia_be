@@ -35,6 +35,10 @@ export class CreateBatchDto {
 
     @IsNotEmpty()
     @IsNumber()
+    available_amount: number
+
+    @IsNotEmpty()
+    @IsNumber()
     purchaseValue: number;
 }
 
