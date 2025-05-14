@@ -4,6 +4,7 @@ import { ClientService } from './client.service';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Roles } from 'src/auth/validators/roles.decorator';
+import { UpdateClientDto } from './dto/update-client.dto';
 
 
 @Controller('client')
@@ -26,5 +27,11 @@ export class ClientController {
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.clientService.findOne(id);
+    }
+
+    @UseGuards(AuthGuard)
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updateClientDto: UpdateClientDto) {
+        return this.clientService.update(id, updateClientDto);
     }
 }
