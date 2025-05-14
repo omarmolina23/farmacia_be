@@ -53,7 +53,7 @@ function extractImagesFromBody(body: Record<string, any>) {
 
 @Controller('product')
 export class ProductsController {
-  constructor(private productsService: ProductsService) {}
+  constructor(private productsService: ProductsService) { }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
@@ -128,19 +128,22 @@ export class ProductsController {
   async filterProducts(
     @Query('category') category?: string,
     @Query('supplier') supplier?: string,
+    @Query('tag') tag?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
     @Query('query') query?: string
-) {
+  ) {
     const categoryArray = category ? category.split(',') : [];
     const supplierArray = supplier ? supplier.split(',') : [];
+    const tagArray = tag ? tag.split(',') : [];
 
     return this.productsService.findFilteredProducts(
-        categoryArray,
-        supplierArray,
-        minPrice ? Number(minPrice) : undefined,
-        maxPrice ? Number(maxPrice) : undefined,
-        query
+      categoryArray,
+      supplierArray,
+      tagArray,
+      minPrice ? Number(minPrice) : undefined,
+      maxPrice ? Number(maxPrice) : undefined,
+      query
     );
   }
 
