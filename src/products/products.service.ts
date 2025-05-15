@@ -139,6 +139,34 @@ export class ProductsService {
         });
     }
 
+    async findAllForSale() {
+        const products = await this.prisma.product.findMany({
+            select: {
+                id: true,
+                name: true,
+                price: true,
+                batches: {
+                    where: {
+                        isExpired: false,
+                    },
+                    select: {
+                        amount: true,
+                    },
+                },
+            },
+        });
+
+        return products.map((product) => {
+            const totalAmount = product.batches.reduce((total, batch) => total + batch.amount, 0);
+            return {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                totalAmount,
+            };
+        })
+    }
+
 
     async findByNameOrId(query?: string) {
         if (!query) {
@@ -202,13 +230,13 @@ export class ProductsService {
         const filters: any = {
             status: 'ACTIVE',
         };
-    
+
         if (minPrice !== undefined || maxPrice !== undefined) {
             filters.price = {};
             if (minPrice !== undefined) filters.price.gte = minPrice;
             if (maxPrice !== undefined) filters.price.lte = maxPrice;
         }
-    
+
         if (categories && categories.length > 0) {
             filters.category = {
                 name: {
@@ -217,7 +245,7 @@ export class ProductsService {
                 },
             };
         }
-    
+
         if (suppliers && suppliers.length > 0) {
             filters.supplier = {
                 name: {
@@ -239,7 +267,7 @@ export class ProductsService {
                 },
             };
         }
-    
+
         if (query) {
             filters.OR = [
                 {
@@ -262,7 +290,7 @@ export class ProductsService {
                 },
             ];
         }
-    
+
         return this.prisma.product.findMany({
             where: filters,
             include: {
@@ -280,8 +308,8 @@ export class ProductsService {
             },
         });
     }
-    
-    
+
+
     async update(id: string, updateProductDto: UpdateProductDto, files: UploadedFile[], images: ImagesDto) {
         try {
 
