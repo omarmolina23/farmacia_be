@@ -80,6 +80,7 @@ model Category {
 
 model Product {
   id               String  @id @default(uuid())
+  barcode          String? @db.VarChar(50)
   name             String  @db.VarChar(100)
   description      String? @db.VarChar(200)
   status           Status  @default(ACTIVE)
