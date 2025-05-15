@@ -124,6 +124,11 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
+  @Get('for-sale')
+  findAllForSale() {
+    return this.productsService.findAllForSale();
+  }
+
   @Get('filter')
   async filterProducts(
     @Query('category') category?: string,
