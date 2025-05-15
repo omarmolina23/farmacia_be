@@ -6,6 +6,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import fastifyCookie from '@fastify/cookie';
+import fastifyWebsocket from '@fastify/websocket';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { fastifyMultipart } from '@fastify/multipart';
 import { FileSizeExceptionFilter } from './filters/file-size-exception.filter';
@@ -16,6 +17,8 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter()
   );
+
+  await app.register(fastifyWebsocket);
 
   await app.register(fastifyMultipart, {
     limits: {
