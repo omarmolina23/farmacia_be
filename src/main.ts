@@ -11,11 +11,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { fastifyMultipart } from '@fastify/multipart';
 import { FileSizeExceptionFilter } from './filters/file-size-exception.filter';
 
-
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter()
+    new FastifyAdapter(),
   );
 
   await app.register(fastifyWebsocket);
@@ -24,7 +23,7 @@ async function bootstrap() {
     limits: {
       fileSize: 5 * 1024 * 1024, // 5 MB
     },
-  })
+  });
 
   const globalPrefix = 'api';
   const port = process.env.PORT || 3000;
@@ -34,7 +33,7 @@ async function bootstrap() {
     .setDescription('Farmacia Nueva Esperanza API')
     .setVersion('1.0')
     .addBearerAuth()
-    .addServer(`/${globalPrefix}`) 
+    .addServer(`/${globalPrefix}`)
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
@@ -44,7 +43,14 @@ async function bootstrap() {
   });
 
   app.useGlobalFilters(new FileSizeExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      disableErrorMessages: false,
+    }),
+  );
   app.setGlobalPrefix(globalPrefix);
 
   app.enableCors({
@@ -54,9 +60,9 @@ async function bootstrap() {
         'https://www.drogueriane.site',
         'https://drogueriane.site',
       ];
-  
+
       const regex = /^https:\/\/farmacia-[a-zA-Z0-9]+-project\.vercel\.app$/;
-  
+
       if (!origin || allowedOrigins.includes(origin) || regex.test(origin)) {
         callback(null, true);
       } else {
@@ -67,7 +73,6 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
   });
-  
 
   await app.listen(port, '0.0.0.0');
 }
