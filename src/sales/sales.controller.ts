@@ -21,16 +21,22 @@ import { Roles } from 'src/auth/validators/roles.decorator';
 export class SalesController {
   constructor(private salesService: SalesService) {}
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin', 'employee')
   @Get(':id')
   async findById(@Param('id') id: string) {
     return this.salesService.findById(id);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin', 'employee')
   @Get()
   async findByDateRange(@Query() query: DateRangeDto) {
     return this.salesService.findByDateRange(query.startDate, query.endDate);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin', 'employee')
   @Patch('return/:id')
   async returnSale(@Param('id') id: string) {
     await this.salesService.returnSale(id);
