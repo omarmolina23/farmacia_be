@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -6,18 +10,23 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class SalesService {
   constructor(private prisma: PrismaService) {}
 
+  private readonly saleInclude = {
+    client: true,
+    products: {
+      include: {
+        products: true,
+        SaleBatch: true,
+      },
+    },
+  };
+
   async findById(id: string) {
+    
+    await this.validateSale(id);
+
     return this.prisma.sale.findUnique({
       where: { id },
-      include: {
-        client: true,
-        products: {
-          include: {
-            products: true,
-            SaleBatch: true,
-          },
-        },
-      },
+      include: this.saleInclude,
     });
   }
 
@@ -42,18 +51,27 @@ export class SalesService {
         },
         repaid: false,
       },
-      include: {
-        client: true,
-        products: {
-          include: {
-            products: true,
-            SaleBatch: true,
-          },
-        },
-      },
+      include: this.saleInclude,
       orderBy: {
         date: 'asc',
       },
     });
+  }
+
+  async returnSale(id: string) {
+    return this.prisma.sale.findUnique({
+      where: { id },
+      include: this.saleInclude,
+    });
+  }
+
+  private async validateSale(saleId: string) {
+    const sale = await this.prisma.sale.findUnique({
+      where: { id: saleId },
+    });
+    if (!sale) throw new NotFoundException('Venta no encontrada');
+    if (sale.repaid)
+      throw new NotFoundException('Venta devolutiva ya realizada');
+    return sale;
   }
 }
