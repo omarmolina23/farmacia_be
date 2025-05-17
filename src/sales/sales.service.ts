@@ -69,6 +69,15 @@ export class SalesService {
               );
             }
 
+            if (batch.available_amount === 0 && batch.status === 'INACTIVE') {
+              await this.prisma.batch.update({
+                where: { id: saleBatch.batchId },
+                data: {
+                  status:'ACTIVE',
+                },
+              });
+            }
+
             await this.prisma.batch.update({
               where: { id: saleBatch.batchId },
               data: {
