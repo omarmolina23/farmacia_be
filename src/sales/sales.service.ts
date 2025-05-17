@@ -10,10 +10,11 @@ export class SalesService {
     return this.prisma.sale.findUnique({
       where: { id },
       include: {
+        client: true,
         products: {
           include: {
             products: true,
-            cliente: true,
+            SaleBatch: true,
           },
         },
       },
@@ -41,10 +42,11 @@ export class SalesService {
         },
       },
       include: {
+        client: true,
         products: {
           include: {
             products: true,
-            cliente: true,
+            SaleBatch: true,
           },
         },
       },
