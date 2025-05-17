@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -20,7 +17,6 @@ export class SalesService {
   };
 
   async findById(id: string) {
-    
     await this.validateSale(id);
 
     return this.prisma.sale.findUnique({
@@ -58,10 +54,44 @@ export class SalesService {
   }
 
   async returnSale(id: string) {
-    return this.prisma.sale.findUnique({
-      where: { id },
-      include: this.saleInclude,
-    });
+    try {
+      const sale = await this.findById(id);
+      if (sale) {
+        for (const product of sale.products) {
+          for (const saleBatch of product.SaleBatch) {
+            const batch = await this.prisma.batch.findUnique({
+              where: { id: saleBatch.batchId },
+            });
+
+            if (!batch) {
+              throw new NotFoundException(
+                `Lote con ID ${saleBatch.batchId} no encontrado`,
+              );
+            }
+
+            await this.prisma.batch.update({
+              where: { id: saleBatch.batchId },
+              data: {
+                available_amount:
+                  Number(batch.available_amount) + Number(saleBatch.quantity),
+              },
+            });
+          }
+        }
+
+        const updateSale = await this.prisma.sale.update({
+          where: { id },
+          data: {
+            repaid: true,
+          },
+          include: this.saleInclude,
+        });
+
+        return updateSale;
+      }
+    } catch (error) {
+      throw error;
+    }
   }
 
   private async validateSale(saleId: string) {

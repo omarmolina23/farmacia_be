@@ -30,4 +30,9 @@ export class SalesController {
   async findByDateRange(@Query() query: DateRangeDto) {
     return this.salesService.findByDateRange(query.startDate, query.endDate);
   }
+
+  @Patch('return/:id')
+  async returnSale(@Param('id') id: string) {
+    await this.salesService.returnSale(id);
+  }
 }
