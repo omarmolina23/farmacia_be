@@ -40,6 +40,7 @@ export class SalesService {
           gte: startDate,
           lte: adjustedEndDate,
         },
+        repaid: false,
       },
       include: {
         client: true,
