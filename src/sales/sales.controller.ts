@@ -34,13 +34,21 @@ export class SalesController {
         return this.salesService.create(createSaleDto);
     }
 
-    @UseGuards(AuthGuard, RolesGuard)
-    @Roles('admin', 'employee')
     @Get(':id')
     async findById(@Param('id') id: string) {
         return this.salesService.findById(id);
     }
 
+    @Get('user/:userId')
+    async findByUserId(@Param('userId') userId: string) {
+        return this.salesService.findByUserId(userId);
+    }
+
+    @Get('pdf/:id')
+    async generatePdf(@Param('id') id: string) {
+        return this.salesService.generatePdf(id);
+    }
+    
     @UseGuards(AuthGuard, RolesGuard)
     @Roles('admin', 'employee')
     @Get('date-range')
