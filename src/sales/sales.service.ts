@@ -258,14 +258,49 @@ export class SalesService {
 
   async generatePdf(id: string) {
     try{
-      await this.validateSale(id);
+      await this.validateSale(id, true);
       const sale = await this.prisma.sale.findUnique({
         where: { id },
         include: this.saleInclude,
       });
 
-      this.invoiceService.generateInvoicePdf(sale);
-      console.log('PDF generado correctamente');
+      const detailedProducts: {
+        name: string;
+        quantity: number;
+        unitPrice: number;
+        subtotal: number;
+      }[] = [];
+
+      const clientFound: {
+        id: string;
+        name: string,
+        email: string;
+      }[] = [];
+
+      
+      if(sale){
+        sale.products.forEach(product => {
+          detailedProducts.push({
+            name: product.products.name,
+            quantity: product.amount,
+            unitPrice: Number(product.products.price),
+            subtotal: product.amount * Number(product.products.price),
+          });
+        });
+        clientFound.push({
+          id: sale.client.id,
+          name: sale.client.name,
+          email: sale.client.email,
+        });
+      }
+
+      const response = await this.invoiceService.generateInvoicePdf({
+        sale: sale,
+        clientFound: clientFound,
+        detailedProducts: detailedProducts
+      });
+      
+      return response;
     }
     catch (error) {
       throw error;
@@ -352,12 +387,12 @@ export class SalesService {
     }
   }
 
-  private async validateSale(saleId: string) {
+  private async validateSale(saleId: string, onlyFound: boolean = false) {
     const sale = await this.prisma.sale.findUnique({
       where: { id: saleId },
     });
     if (!sale) throw new NotFoundException('Venta no encontrada');
-    if (sale.repaid)
+    if (sale.repaid && !onlyFound)
       throw new NotFoundException('Venta devolutiva ya realizada');
     return sale;
   }
