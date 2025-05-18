@@ -365,7 +365,7 @@ export class ProductsService {
     try {
       const { ProductTag, ...product } = updateProductDto;
 
-      await this.validateProduct(product, ProductTag);
+      await this.validateProduct({ ...product, id }, ProductTag);
 
       const newImageUrls = await this.uploadImagesProduct(product, files);
 
