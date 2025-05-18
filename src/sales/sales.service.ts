@@ -7,6 +7,7 @@ import { CreateSaleDto } from './dto/create-sale.dto';
 import { Decimal } from '@prisma/client/runtime/library';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import { UpdateSaleDto } from './dto/update-sale.dto';
 
 @Injectable()
 export class SalesService {
@@ -215,9 +216,14 @@ export class SalesService {
     client: true,
     products: {
       include: {
-        products: true,
-        SaleBatch: true,
-      },
+        products: {
+          include: {
+            category: true,
+            supplier: true,
+          }
+        },
+        SaleBatch: true, // Include SaleBatch relation
+      }
     },
   };
 
@@ -258,8 +264,9 @@ export class SalesService {
     });
   }
 
-  async returnSale(id: string) {
+  async returnSale(id: string, updateSaleDto: UpdateSaleDto) {
     try {
+      const { number_credit_note } = updateSaleDto;
       const sale = await this.findById(id);
       if (sale) {
         for (const product of sale.products) {
@@ -297,6 +304,7 @@ export class SalesService {
           where: { id },
           data: {
             repaid: true,
+            number_credit_note: number_credit_note,
           },
           include: this.saleInclude,
         });
