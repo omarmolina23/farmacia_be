@@ -39,10 +39,10 @@ model User {
 }
 
 model Client {
-  id    String              @id
-  name  String              @db.VarChar(50)
-  email String              @db.VarChar(50)
-  phone String              @db.VarChar(20)
+  id    String @id
+  name  String @db.VarChar(50)
+  email String @db.VarChar(50)
+  phone String @db.VarChar(20)
 
   Sale Sale[]
 }
@@ -113,27 +113,28 @@ model ProductImage {
 }
 
 model Sale {
-  id           String   @id @default(uuid())
-  clientId     String   @db.VarChar(50)
-  employeeName String   @db.VarChar(50)
-  total        Decimal  @db.Decimal(10, 0)
-  date         DateTime @default(now())
-  bill_id      String?   @db.VarChar(50)
-  factus_number String?   @db.VarChar(50)
-  cufe         String?   @db.VarChar(50)
-  qr_image     String?   @db.VarChar(500)
+  id                 String   @id @default(uuid())
+  clientId           String   @db.VarChar(50)
+  employeeName       String   @db.VarChar(50)
+  total              Decimal  @db.Decimal(10, 0)
+  date               DateTime @default(now())
+  bill_id            Decimal  @db.Decimal(10, 0)
+  number_e_invoice   String?  
+  number_credit_note String?  
+  cufe               String?  
+  qr_image           String?  
 
   repaid Boolean @default(false)
 
-  client Client @relation(fields: [clientId], references: [id])
+  client   Client              @relation(fields: [clientId], references: [id])
   products SaleProductClient[]
 }
 
 model SaleProductClient {
-  id           String @id @default(uuid())
-  productId    String
-  saleId       String
-  amount       Int
+  id        String @id @default(uuid())
+  productId String
+  saleId    String
+  amount    Int
 
   products Product @relation(fields: [productId], references: [id])
   venta    Sale    @relation(fields: [saleId], references: [id])

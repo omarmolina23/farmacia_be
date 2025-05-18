@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { InvoiceService } from 'src/invoice/invoice.service';
 import { MailerService } from '@nestjs-modules/mailer';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { Decimal } from '@prisma/client/runtime/library';
 import * as path from 'path';
@@ -13,6 +14,7 @@ export class SalesService {
         private prisma: PrismaService,
         private invoiceService: InvoiceService,
         private mailerService: MailerService,
+        private cloudinaryService: CloudinaryService,
     ) { }
 
     async create(createSaleDto: CreateSaleDto) {
@@ -54,7 +56,7 @@ export class SalesService {
                     total += Number(product.price) * amount;
 
                     const subtotal = Number(product.price) * amount;
-                    total += subtotal;
+
 
                     detailedProducts.push({
                         name: product.name,
@@ -64,12 +66,13 @@ export class SalesService {
                     });
                 }
 
+                //const qrImageUrl = await this.cloudinaryService.uploadFileBase64(qr_image, `qr_${rest.clientId}_${crypto.randomUUID()}`);
                 // Crear la venta con total calculado
                 const sale = await tx.sale.create({
                     data: {
                         ...rest,
                         total: new Decimal(total),
-                        repaid: false,
+                        repaid: false
                     },
                 });
 
@@ -194,6 +197,16 @@ export class SalesService {
         return await this.prisma.sale.findMany({
             include: {
                 client: true,
+                products: {
+                    include: {
+                        products: {
+                            include: {
+                                category: true,
+                                supplier: true,
+                            }
+                        }
+                    }
+                },
             },
         });
     }

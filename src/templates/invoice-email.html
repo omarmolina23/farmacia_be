@@ -105,7 +105,10 @@
 
       <div class="invoice-info">
         <strong>Fecha:</strong> {{date}}<br />
-        <strong>N.º Factura:</strong> {{invoiceNumber}}
+        <strong>N.º Factura:</strong> {{invoiceNumber}}<br />
+        <strong>Factura Electrónica de Venta No: </strong>{{invoiceENumber}}<br />
+        <strong>CUFE:</strong>{{cufe}}<br />
+
       </div>
     </div>
 
@@ -132,6 +135,15 @@
 
     <div class="totals">
       <p>Total: ${{total}}</p>
+    </div>
+
+    <div style="margin-top: 30px; text-align: center;">
+      <p>Escanee el código QR para ver la factura electrónica:</p>
+      <img
+        src="{{qrImage}}"
+        alt="Código QR"
+        style="max-width: 150px;"
+      />
     </div>
 
     <div class="footer">

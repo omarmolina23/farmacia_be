@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsArray, IsBoolean, IsDecimal, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
+import { IsArray, IsBoolean, IsDecimal, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
 import { CreateSaleProductClientDto } from "./create-sale-product-client.dto";
 
 export class CreateSaleDto {
@@ -18,12 +18,16 @@ export class CreateSaleDto {
     total: number
 
     @IsOptional()
-    @IsString()
-    bill_id: string
+    @IsNumber()
+    bill_id: number
 
     @IsOptional()
     @IsString()
-    factus_number: string
+    number_e_invoice: string
+
+    @IsOptional()
+    @IsString()
+    number_credit_note: string
 
     @IsOptional()
     @IsString()

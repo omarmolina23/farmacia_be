@@ -31,6 +31,9 @@ export class InvoiceService {
                 second: '2-digit',
             }),
             invoiceNumber: invoiceData.sale.id, 
+            invoiceENumber: invoiceData.sale.number_e_invoice,
+            cufe: invoiceData.sale.cufe,
+            qrImage: invoiceData.sale.qr_image,
             items: invoiceData.detailedProducts,
             total: invoiceData.sale.total.toFixed(2),
         });
