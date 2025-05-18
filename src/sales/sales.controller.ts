@@ -51,8 +51,11 @@ export class SalesController {
     @UseGuards(AuthGuard, RolesGuard)
     @Roles('admin', 'employee')
     @Patch('return/:id')
-    async returnSale(@Param('id') id: string) {
-        await this.salesService.returnSale(id);
+    async returnSale(
+        @Param('id') id: string,
+        @Body() updateSaleDto: UpdateSaleDto,
+    ) {
+        return await this.salesService.returnSale(id, updateSaleDto);
     }
 
 }
