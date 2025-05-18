@@ -216,9 +216,14 @@ export class SalesService {
     client: true,
     products: {
       include: {
-        products: true,
-        SaleBatch: true,
-      },
+        products: {
+          include: {
+            category: true,
+            supplier: true,
+          }
+        },
+        SaleBatch: true, // Include SaleBatch relation
+      }
     },
   };
 
