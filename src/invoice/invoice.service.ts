@@ -27,7 +27,7 @@ export class InvoiceService {
                 minute: '2-digit',
                 second: '2-digit',
             }),
-            invoiceNumber: invoiceData.sale.id, 
+            invoiceNumber: invoiceData.sale.id,
             invoiceENumber: invoiceData.sale.number_e_invoice,
             cufe: invoiceData.sale.cufe,
             qrImage: invoiceData.sale.qr_image,
@@ -36,7 +36,10 @@ export class InvoiceService {
         });
 
         // 4. Generar PDF con Puppeteer
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+
         const page = await browser.newPage();
         await page.setContent(html, { waitUntil: 'load' });
 

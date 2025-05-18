@@ -228,12 +228,48 @@ export class SalesService {
   };
 
   async findById(id: string) {
-    await this.validateSale(id);
+
+    try{
+      await this.validateSale(id);
 
     return this.prisma.sale.findUnique({
       where: { id },
       include: this.saleInclude,
     });
+    }
+    catch (error) {
+      throw error;
+    }
+    
+  }
+
+  async findByUserId(userId: string) {
+    try{
+      return this.prisma.sale.findMany({
+      where: { clientId: userId },
+      include: this.saleInclude,
+    });
+    }
+    catch (error) {
+      throw error;
+    }
+    
+  }
+
+  async generatePdf(id: string) {
+    try{
+      await this.validateSale(id);
+      const sale = await this.prisma.sale.findUnique({
+        where: { id },
+        include: this.saleInclude,
+      });
+
+      this.invoiceService.generateInvoicePdf(sale);
+      console.log('PDF generado correctamente');
+    }
+    catch (error) {
+      throw error;
+    }
   }
 
   async findByDateRange(startDate: Date, endDate: Date) {
