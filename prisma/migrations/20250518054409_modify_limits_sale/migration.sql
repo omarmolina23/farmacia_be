@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Sale" ALTER COLUMN "cufe" SET DATA TYPE TEXT,
+ALTER COLUMN "qr_image" SET DATA TYPE TEXT,
+ALTER COLUMN "number_credit_note" SET DATA TYPE TEXT,
+ALTER COLUMN "number_e_invoice" SET DATA TYPE TEXT;

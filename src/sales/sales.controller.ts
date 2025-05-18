@@ -20,6 +20,17 @@ import { Roles } from 'src/auth/validators/roles.decorator';
 @Controller('sales')
 export class SalesController {
   constructor(private salesService: SalesService) {}
+ 
+  @Get()
+    findAll() {
+        return this.salesService.findAll();
+    }
+
+    @UseGuards(AuthGuard)
+    @Post()
+    create(@Body() createSaleDto: CreateSaleDto) {
+        return this.salesService.create(createSaleDto);
+    }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin', 'employee')
@@ -41,4 +52,5 @@ export class SalesController {
   async returnSale(@Param('id') id: string) {
     await this.salesService.returnSale(id);
   }
+
 }
