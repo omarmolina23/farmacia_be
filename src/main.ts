@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import {
   FastifyAdapter,
@@ -34,7 +34,7 @@ async function bootstrap() {
     .setDescription('Farmacia Nueva Esperanza API')
     .setVersion('1.0')
     .addBearerAuth()
-    .addServer(`/${globalPrefix}`) 
+    .addServer(`/${globalPrefix}`)
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
@@ -44,7 +44,22 @@ async function bootstrap() {
   });
 
   app.useGlobalFilters(new FileSizeExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(
+  new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+    exceptionFactory: (errors) => {
+      const messages = errors.map((error) =>
+        error.constraints ? Object.values(error.constraints).join(', ') : ''
+      );
+      return new BadRequestException(messages);
+    },
+  }),
+);
+
+
+
   app.setGlobalPrefix(globalPrefix);
 
   app.enableCors({
@@ -54,9 +69,9 @@ async function bootstrap() {
         'https://www.drogueriane.site',
         'https://drogueriane.site',
       ];
-  
+
       const regex = /^https:\/\/farmacia-[a-zA-Z0-9]+-project\.vercel\.app$/;
-  
+
       if (!origin || allowedOrigins.includes(origin) || regex.test(origin)) {
         callback(null, true);
       } else {
@@ -67,7 +82,7 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
   });
-  
+
 
   await app.listen(port, '0.0.0.0');
 }
