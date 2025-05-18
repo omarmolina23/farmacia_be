@@ -87,6 +87,7 @@ export class ProductsController {
     const createProductDto = new CreateProductDto();
 
     createProductDto.name = body['name'];
+    createProductDto.barcode = body['barcode'];
     createProductDto.description = body['description'];
     createProductDto.categoryId = body['categoryId'];
     createProductDto.supplierId = body['supplierId'];
@@ -194,6 +195,7 @@ export class ProductsController {
     const imagesDto = new ImagesDto();
 
     updateProductDto.name = body['name'];
+    updateProductDto.barcode = body['barcode'];
     updateProductDto.description = body['description'];
     updateProductDto.categoryId = body['categoryId'];
     updateProductDto.supplierId = body['supplierId'];
