@@ -6,8 +6,7 @@ import { Image, ImagesDto } from './dto/images.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 import { v4 as uuid } from 'uuid';
-import { validate } from 'class-validator';
-import { TagController } from 'src/tag/tag.controller';
+
 
 type UploadedFile = {
     filename: string;
@@ -145,22 +144,39 @@ export class ProductsService {
                 id: true,
                 name: true,
                 price: true,
+                category:{
+                    select: {
+                        name: true,
+                    }
+                },
+                supplier: {
+                    select: {
+                        name: true,
+                    }
+                },
                 batches: {
                     where: {
                         isExpired: false,
                     },
                     select: {
-                        amount: true,
+                        available_amount: true,
                     },
                 },
+                
             },
+            where:{
+                status: 'ACTIVE',
+            }
         });
 
         return products.map((product) => {
-            const totalAmount = product.batches.reduce((total, batch) => total + batch.amount, 0);
+            const totalAmount = product.batches.reduce((total, batch) => total + batch.available_amount, 0);
+
             return {
                 id: product.id,
                 name: product.name,
+                category: product.category.name,
+                supplier: product.supplier.name,
                 price: product.price,
                 totalAmount,
             };

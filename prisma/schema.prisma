@@ -123,7 +123,7 @@ model Sale {
   cufe         String?   @db.VarChar(50)
   qr_image     String?   @db.VarChar(500)
 
-  repaid Boolean
+  repaid Boolean @default(false)
 
   client Client @relation(fields: [clientId], references: [id])
   products SaleProductClient[]
