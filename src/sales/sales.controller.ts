@@ -32,7 +32,7 @@ export class SalesController {
   @Roles('admin', 'employee')
   @Get()
   async findByDateRange(@Query() query: DateRangeDto) {
-    return this.salesService.findByDateRange(query.startDate, query.endDate);
+    return this.salesService.findByDateRange(query.startDate, query.endDate, query.repaid);
   }
 
   @UseGuards(AuthGuard, RolesGuard)

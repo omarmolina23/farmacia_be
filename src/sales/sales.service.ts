@@ -25,7 +25,7 @@ export class SalesService {
     });
   }
 
-  async findByDateRange(startDate: Date, endDate: Date) {
+  async findByDateRange(startDate: Date, endDate: Date, repaid?: boolean) {
     const adjustedEndDate = new Date(
       Date.UTC(
         endDate.getUTCFullYear(),
@@ -38,13 +38,19 @@ export class SalesService {
       ),
     );
 
+    if(repaid === undefined) { 
+      repaid = false;
+    }
+    
+    console.log(repaid);
+
     return this.prisma.sale.findMany({
       where: {
         date: {
           gte: startDate,
           lte: adjustedEndDate,
         },
-        repaid: false,
+        repaid: repaid,
       },
       include: this.saleInclude,
       orderBy: {
