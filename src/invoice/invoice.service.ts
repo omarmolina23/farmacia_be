@@ -7,11 +7,8 @@ import * as puppeteer from 'puppeteer';
 export class InvoiceService {
     async generateInvoicePdf(invoiceData: any): Promise<Buffer> {
 
-        console.log("invoiceData", invoiceData);
-
         const templatePath = path.join(__dirname, '..', '..', 'templates', 'invoice-email.html');
 
-        console.log("templatePath", templatePath);
         // 1. Cargar la plantilla
         const template = await fs.readFile(templatePath, 'utf-8');
 
