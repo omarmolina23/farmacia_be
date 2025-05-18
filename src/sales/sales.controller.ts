@@ -34,20 +34,17 @@ export class SalesController {
         return this.salesService.create(createSaleDto);
     }
 
-    @Get(':id')
-    async findById(@Param('id') id: string) {
-        return this.salesService.findById(id);
+    @Get('pdf/:id')
+    async generatePdf(@Param('id') id: string) {
+        return this.salesService.generatePdf(id);
     }
-
+    
     @Get('user/:userId')
     async findByUserId(@Param('userId') userId: string) {
         return this.salesService.findByUserId(userId);
     }
 
-    @Get('pdf/:id')
-    async generatePdf(@Param('id') id: string) {
-        return this.salesService.generatePdf(id);
-    }
+    
     
     @UseGuards(AuthGuard, RolesGuard)
     @Roles('admin', 'employee')
@@ -65,5 +62,11 @@ export class SalesController {
     ) {
         return await this.salesService.returnSale(id, updateSaleDto);
     }
+
+    @Get(':id')
+    async findById(@Param('id') id: string) {
+        return this.salesService.findById(id);
+    }
+
 
 }
