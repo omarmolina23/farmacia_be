@@ -10,9 +10,10 @@ import { TagModule } from './tag/tag.module';
 import { ClientModule } from './client/client.module';
 import { SalesModule } from './sales/sales.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, CategoryModule, SupplierModule, ProductsModule, BatchModule, TagModule, ClientModule, SalesModule, CloudinaryModule, ScheduleModule.forRoot()],
+  imports: [AuthModule, UsersModule, CategoryModule, SupplierModule, ProductsModule, BatchModule, TagModule, ClientModule, SalesModule, CloudinaryModule, ScheduleModule.forRoot(), DashboardModule],
   controllers: [],
   providers: [],
 })
