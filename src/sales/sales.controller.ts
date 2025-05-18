@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
@@ -13,10 +13,12 @@ export class SalesController {
 
     @Get()
     findAll() {
-        console.log('findAll');
+        return this.salesService.findAll();
     }
+
+    @UseGuards(AuthGuard)
     @Post()
     create(@Body() createSaleDto: CreateSaleDto) {
-        this.salesService.create(createSaleDto);
+        return this.salesService.create(createSaleDto);
     }
 }
