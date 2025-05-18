@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import {
   FastifyAdapter,
@@ -11,10 +11,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { fastifyMultipart } from '@fastify/multipart';
 import { FileSizeExceptionFilter } from './filters/file-size-exception.filter';
 
+
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter(),
+    new FastifyAdapter()
   );
 
   await app.register(fastifyWebsocket);
@@ -23,7 +24,7 @@ async function bootstrap() {
     limits: {
       fileSize: 5 * 1024 * 1024, // 5 MB
     },
-  });
+  })
 
   const globalPrefix = 'api';
   const port = process.env.PORT || 3000;
@@ -44,13 +45,21 @@ async function bootstrap() {
 
   app.useGlobalFilters(new FileSizeExceptionFilter());
   app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      disableErrorMessages: false,
-    }),
-  );
+  new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+    exceptionFactory: (errors) => {
+      const messages = errors.map((error) =>
+        error.constraints ? Object.values(error.constraints).join(', ') : ''
+      );
+      return new BadRequestException(messages);
+    },
+  }),
+);
+
+
+
   app.setGlobalPrefix(globalPrefix);
 
   app.enableCors({
@@ -73,6 +82,7 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
   });
+
 
   await app.listen(port, '0.0.0.0');
 }

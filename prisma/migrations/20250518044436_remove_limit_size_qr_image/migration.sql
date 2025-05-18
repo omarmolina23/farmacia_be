@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Sale" ALTER COLUMN "qr_image" SET DATA TYPE TEXT;

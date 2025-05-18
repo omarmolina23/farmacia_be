@@ -5,10 +5,11 @@ import {
     Catch,
     ArgumentsHost,
     HttpStatus,
+    PayloadTooLargeException,
   } from '@nestjs/common';
   import { FastifyReply } from 'fastify';
   
-  @Catch()
+  @Catch(PayloadTooLargeException)
   export class FileSizeExceptionFilter implements ExceptionFilter {
     catch(exception: any, host: ArgumentsHost) {
       const ctx = host.switchToHttp();

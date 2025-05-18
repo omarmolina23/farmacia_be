@@ -19,6 +19,12 @@ export class ClientService {
         try {
             const { id } = createClientDto;
 
+            const existingClient = await this.prisma.client.findUnique({ where: { id } });
+            
+            if (existingClient) {
+                throw new BadRequestException('El cliente ya existe');
+            }
+
             this.validateId(id);
 
             return await this.prisma.client.create({ data: createClientDto });
