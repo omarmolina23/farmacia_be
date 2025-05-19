@@ -20,7 +20,7 @@ export class SupplierService {
       });
     } catch (error) {
       if (error.code === 'P2002') {
-        throw new ConflictException('Supplier already exists');
+        throw new ConflictException('El proveedor ya existe');
       }
       throw error;
     }
@@ -30,47 +30,67 @@ export class SupplierService {
     return await this.prisma.supplier.findMany();
   }
 
-  async findOne(id: string) {
-    const supplier = await this.prisma.supplier.findUnique({
+  async findByNameOrEmail(query?: string) {
+    if (!query) {
+      return await this.prisma.supplier.findMany();
+    }
+
+    const suppliers = await this.prisma.supplier.findMany({
       where: {
-        id: id,
+        OR: [
+          { name: { contains: query, mode: 'insensitive' } },
+          { email: { contains: query, mode: 'insensitive' } },
+        ],
       },
     });
 
-    if (!supplier) {
-      throw new NotFoundException(`Supplier with ID ${id} not found`);
+    if (!suppliers.length) {
+      throw new NotFoundException(
+        `No se encontraron proveedores con el nombre o email "${query}"`,
+      );
     }
 
-    return supplier;
+    return suppliers;
   }
 
   async update(id: string, updateSupplierDto: UpdateSupplierDto) {
-    const updateSupplier = await this.prisma.supplier.update({
-      where: {
-        id: id,
-      },
-      data: {
-        ...updateSupplierDto,
-      },
-    });
+    try {
+      const updateSupplier = await this.prisma.supplier.update({
+        where: {
+          id: id,
+        },
+        data: {
+          ...updateSupplierDto,
+        },
+      });
 
-    if (!updateSupplier) {
-      throw new NotFoundException(`Supplier with ID ${id} not found`);
+      if (!updateSupplier) {
+        throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
+      }
+
+      return updateSupplier;
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new ConflictException('El proveedor ya existe');
+      }
+      throw error;
     }
-
-    return updateSupplier;
   }
 
   async remove(id: string) {
-    const deleteSupplier = await this.prisma.supplier.delete({
-      where: {
-        id: id,
-      },
-    });
-    if (!deleteSupplier) {
-      throw new NotFoundException(`Supplier with ID ${id} not found`);
-    }
+    try {
+      const supplier = await this.prisma.supplier.findUnique({ where: { id } });
 
-    return deleteSupplier;
+      if (!supplier) {
+        throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
+      }
+
+      return await this.prisma.supplier.update({
+        where: { id },
+        data: { status: 'INACTIVE' },
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 }

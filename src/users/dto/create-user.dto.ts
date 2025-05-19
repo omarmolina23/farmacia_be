@@ -1,9 +1,16 @@
-import { IsNotEmpty, IsString, IsDate, IsBoolean, IsEmail, IsStrongPassword, IsEnum, IsOptional } from "class-validator";
+import { IsNotEmpty, IsString, IsDate, IsBoolean, IsEmail, IsStrongPassword, IsEnum, IsOptional, IsPhoneNumber } from "class-validator";
+import { IsStrongPasswordCustom } from "../validators/is-strong-password.decorator";
 import { Type } from "class-transformer";
 
 export enum Status {
     ACTIVE = 'ACTIVE',
     INACTIVE = 'INACTIVE',
+}
+
+export enum documentType {
+    CC = "CC",
+    CE = "CE",
+    NIT = "NIT"
 }
 
 export class CreateUserDto {
@@ -13,11 +20,15 @@ export class CreateUserDto {
     id: string;
 
     @IsNotEmpty()
+    @IsEnum(documentType)
+    documentType: documentType;
+
+    @IsNotEmpty()
     @IsString()
     name: string;
 
     @IsNotEmpty()
-    @IsString()
+    @IsPhoneNumber()
     phone: string;
 
     @IsNotEmpty()
@@ -26,7 +37,7 @@ export class CreateUserDto {
 
     @IsOptional()
     @IsString()
-    @IsStrongPassword()
+    @IsStrongPasswordCustom()
     password?: string;
 
     @IsNotEmpty()

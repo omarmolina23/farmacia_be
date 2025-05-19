@@ -9,7 +9,7 @@ import { UpdateCategoryDto } from './dto/update.category';
 
 @Injectable()
 export class CategoryService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async create(createCategoryDto: CreateCategoryDto) {
     try {
@@ -20,7 +20,7 @@ export class CategoryService {
       });
     } catch (error) {
       if (error.code === 'P2002') {
-        throw new ConflictException('Category already exists');
+        throw new ConflictException('Ya existe la categoria');
       }
       throw error;
     }
@@ -30,16 +30,15 @@ export class CategoryService {
     return await this.prisma.category.findMany();
   }
 
-  async findOne(id: string) {
-    const category = await this.prisma.category.findUnique({
+  async findByName(query?: string) {
+    const category = await this.prisma.category.findMany({
       where: {
-        id: id,
+        name: {
+          contains: query,
+          mode: 'insensitive',
+        },
       },
-    });
-
-    if (!category) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
-    }
+    })
 
     return category;
   }
@@ -55,22 +54,27 @@ export class CategoryService {
     });
 
     if (!updateUser) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
+      throw new NotFoundException(`La categoría con ID ${id} no fue encontrada`);
     }
 
     return updateUser;
   }
 
   async remove(id: string) {
-    const deleteCategory = await this.prisma.category.delete({
-      where: {
-        id: id,
-      },
-    });
-    if (!deleteCategory) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
+    try {
+      const category = await this.prisma.category.findUnique({ where: { id } });
+
+      if (!category) {
+        throw new NotFoundException(`La categoría con ID ${id} no fue encontrada`);
+      }
+
+      return await this.prisma.category.update({
+        where: { id },
+        data: { status: 'INACTIVE' },
+      })
+    } catch (error) {
+      throw error;
     }
 
-    return deleteCategory;
   }
 }
