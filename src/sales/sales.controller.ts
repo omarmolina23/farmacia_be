@@ -44,15 +44,11 @@ export class SalesController {
         return this.salesService.findByUserId(userId);
     }
     
-    @UseGuards(AuthGuard, RolesGuard)
-    @Roles('admin', 'employee')
     @Get('date-range')
     async findByDateRange(@Query() query: DateRangeDto) {
         return this.salesService.findByDateRange(query.startDate, query.endDate, query.repaid);
     }
 
-    @UseGuards(AuthGuard, RolesGuard)
-    @Roles('admin', 'employee')
     @Patch('return/:id')
     async returnSale(
         @Param('id') id: string,
