@@ -16,11 +16,16 @@ export class ClientService {
     }
 
     async create(createClientDto: CreateClientDto) {
+        console.log('createClientDto', createClientDto);
         try {
             const { id } = createClientDto;
 
             const existingClient = await this.prisma.client.findUnique({ where: { id } });
+<<<<<<< Updated upstream
             
+=======
+
+>>>>>>> Stashed changes
             if (existingClient) {
                 throw new BadRequestException('El cliente ya existe');
             }
@@ -30,6 +35,7 @@ export class ClientService {
             return await this.prisma.client.create({ data: createClientDto });
         }
         catch (error) {
+            console.error('Error al crear el cliente:', error);
             throw error;
         }
     }
