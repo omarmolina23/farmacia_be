@@ -21,11 +21,7 @@ export class ClientService {
             const { id } = createClientDto;
 
             const existingClient = await this.prisma.client.findUnique({ where: { id } });
-<<<<<<< Updated upstream
             
-=======
-
->>>>>>> Stashed changes
             if (existingClient) {
                 throw new BadRequestException('El cliente ya existe');
             }
