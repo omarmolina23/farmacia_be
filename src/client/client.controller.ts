@@ -23,7 +23,6 @@ export class ClientController {
         return this.clientService.findAll();
     }
 
-    @UseGuards(AuthGuard)
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.clientService.findOne(id);
