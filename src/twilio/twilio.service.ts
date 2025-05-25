@@ -26,7 +26,7 @@ export class TwilioService {
 
       return verification.status;
     } catch (error) {
-      throw new Error('Failed to send verification code');
+      throw new Error('Failed to send verification code ' + error.message);
     }
   }
 
