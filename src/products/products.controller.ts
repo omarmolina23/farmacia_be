@@ -199,7 +199,7 @@ export class ProductsController {
     updateProductDto.description = body['description'];
     updateProductDto.categoryId = body['categoryId'];
     updateProductDto.supplierId = body['supplierId'];
-    updateProductDto.price = Number(body['price']);
+    updateProductDto.price = Number(body['price']) || undefined;
     updateProductDto.concentration = body['concentration'];
     updateProductDto.activeIngredient = body['activeIngredient'];
     updateProductDto.weight = body['weight'];
@@ -216,6 +216,8 @@ export class ProductsController {
       }
     }
 
+    console.log("Hi guys", body);
+    console.log("UpdateProductDto", updateProductDto);
     const errors = await validate(updateProductDto);
 
     if (errors.length > 0) {

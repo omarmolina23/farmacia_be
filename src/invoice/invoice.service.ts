@@ -7,6 +7,8 @@ import * as puppeteer from 'puppeteer';
 export class InvoiceService {
     async generateInvoicePdf(invoiceData: any): Promise<Buffer> {
 
+        console.log('Generating invoice PDF...', invoiceData);
+
         const templatePath = path.join(__dirname, '..', '..', 'templates', 'invoice-email.html');
 
         // 1. Cargar la plantilla
@@ -27,10 +29,10 @@ export class InvoiceService {
                 minute: '2-digit',
                 second: '2-digit',
             }),
-            invoiceNumber: invoiceData.sale.id,
-            invoiceENumber: invoiceData.sale.number_e_invoice,
-            cufe: invoiceData.sale.cufe,
-            qrImage: invoiceData.sale.qr_image,
+            invoiceNumber: invoiceData.sale.id || 'No disponible',
+            invoiceENumber: invoiceData.sale.number_e_invoice || 'No disponible',
+            cufe: invoiceData.sale.cufe || 'No disponible',
+            qrImage: invoiceData.sale.qr_image || '',
             items: invoiceData.detailedProducts,
             total: invoiceData.sale.total.toFixed(2),
         });

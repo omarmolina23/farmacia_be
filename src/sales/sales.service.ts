@@ -256,6 +256,66 @@ export class SalesService {
     
   }
 
+  async generateEInvoice(id: string, updateSaleDto: UpdateSaleDto){
+    try {
+      const { bill_id, number_e_invoice, cufe, qr_image } = updateSaleDto;
+      const sale = await this.findById(id);
+
+      console.log("Hola")
+
+      const updatedSale = await this.prisma.sale.update({
+        where: { id },
+        data: {
+          bill_id,
+          number_e_invoice,
+          cufe,
+          qr_image,
+        },
+        include: this.saleInclude,
+      });
+
+      if (!sale) {
+        throw new NotFoundException('Venta no encontrada');
+      }
+
+      const pdf_sale = await this.invoiceService.generateInvoicePdf({
+        sale: updatedSale,
+        clientFound: [
+          {
+            id: sale.client.id,
+            name: sale.client.name,
+            email: sale.client.email,
+          }
+        ],
+        detailedProducts: sale.products.map((product) => ({
+          name: product.products.name,
+          quantity: product.amount,
+          unitPrice: Number(product.products.price),
+          subtotal: product.amount * Number(product.products.price),
+        })),
+      });
+
+      await this.mailerService.sendMail({
+        to: sale.client.email,
+        subject: `Factura de tu compra - Venta #${updatedSale.id}`,
+        html: `<p>Hola ${sale.client.name},</p>
+            <p>Gracias por tu compra. Adjuntamos la factura correspondiente a tu venta #${updatedSale.id}.</p>
+            <p>¡Gracias por elegirnos!</p>`,
+        attachments: [
+          {
+            filename: `factura-${updatedSale.id}.pdf`,
+            content: pdf_sale,
+            contentType: 'application/pdf',
+          },
+        ],
+      });
+
+      return updatedSale;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async generatePdf(id: string) {
     try{
       await this.validateSale(id, true);
