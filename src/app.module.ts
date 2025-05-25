@@ -11,9 +11,10 @@ import { ClientModule } from './client/client.module';
 import { SalesModule } from './sales/sales.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { TwilioModule } from './twilio/twilio.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, CategoryModule, SupplierModule, ProductsModule, BatchModule, TagModule, ClientModule, SalesModule, CloudinaryModule, ScheduleModule.forRoot(), DashboardModule],
+  imports: [AuthModule, UsersModule, CategoryModule, SupplierModule, ProductsModule, BatchModule, TagModule, ClientModule, SalesModule, CloudinaryModule, ScheduleModule.forRoot(), DashboardModule, TwilioModule],
   controllers: [],
   providers: [],
 })
