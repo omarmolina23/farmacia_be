@@ -26,7 +26,6 @@ export class ClientService {
   }
 
   async create(createClientDto: CreateClientDto) {
-    console.log('createClientDto', createClientDto);
     try {
       const { id } = createClientDto;
 

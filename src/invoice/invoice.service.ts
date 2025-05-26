@@ -7,8 +7,6 @@ import * as puppeteer from 'puppeteer';
 export class InvoiceService {
     async generateInvoicePdf(invoiceData: any): Promise<Buffer> {
 
-        console.log('Generating invoice PDF...', invoiceData);
-
         const templatePath = path.join(__dirname, '..', '..', 'templates', 'invoice-email.html');
 
         // 1. Cargar la plantilla

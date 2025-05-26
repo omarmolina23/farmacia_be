@@ -261,8 +261,6 @@ export class SalesService {
       const { bill_id, number_e_invoice, cufe, qr_image } = updateSaleDto;
       const sale = await this.findById(id);
 
-      console.log("Hola")
-
       const updatedSale = await this.prisma.sale.update({
         where: { id },
         data: {
@@ -384,8 +382,6 @@ export class SalesService {
       repaid = false;
     }
     
-    console.log(repaid);
-
     return this.prisma.sale.findMany({
       where: {
         date: {
