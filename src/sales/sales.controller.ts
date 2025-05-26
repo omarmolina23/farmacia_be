@@ -45,7 +45,6 @@ export class SalesController {
         @Param('id') id: string,
         @Body() updateSaleDto: UpdateSaleDto
     ) {
-        console.log('id', id, updateSaleDto)
         return this.salesService.generateEInvoice(id, updateSaleDto);
     }
     

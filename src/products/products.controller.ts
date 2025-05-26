@@ -216,8 +216,6 @@ export class ProductsController {
       }
     }
 
-    console.log("Hi guys", body);
-    console.log("UpdateProductDto", updateProductDto);
     const errors = await validate(updateProductDto);
 
     if (errors.length > 0) {
