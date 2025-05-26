@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Código de Verificación</title>
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background-color: #e2f6e3;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .header {
+      text-align: center;
+      padding: 10px 0;
+    }
+    .header img {
+      width: 100%;
+      max-height: 120px;
+      object-fit: contain;
+    }
+    .code-box {
+      background-color: #40b147;
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: bold;
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 4px;
+      margin: 20px 0;
+      letter-spacing: 2px;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #666;
+      font-family: 'Roboto', Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="https://res.cloudinary.com/dcvikbhm6/image/upload/v1742098103/dzuvp1n5jnssnspkxs4t.png" alt="Logo de la empresa" />
+    </div>
+    <h2>Tu código de verificación</h2>
+    <p>Hola, </p>
+    <p>Usa el siguiente código para continuar con tu proceso de verificación:</p>
+    <div class="code-box">{{code}}</div>
+    <p>Este código expira en 10 minutos.</p>
+    <p>Si no solicitaste este código, puedes ignorar este mensaje.</p>
+    <p class="footer">&copy; 2025 Nueva Esperanza. Todos los derechos reservados.</p>
+  </div>
+</body>
+</html>
