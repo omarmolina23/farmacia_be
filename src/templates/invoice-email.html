@@ -41,6 +41,11 @@
         margin-bottom: 20px;
       }
 
+      .long-text {
+        word-break: break-all;
+        white-space: normal;
+      }
+
       table {
         width: 100%;
         border-collapse: collapse;
@@ -107,7 +112,7 @@
         <strong>N.º Factura:</strong> {{invoiceNumber}}<br />
         <strong>Factura Electrónica de Venta No: </strong
         >{{invoiceENumber}}<br />
-        <strong>{{cufeLabel}}: </strong>{{cufe}}<br />
+        <strong>{{cufeLabel}}: </strong><span class="long-text">{{cufe}}</span><br />
       </div>
     </div>
 
