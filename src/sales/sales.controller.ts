@@ -38,6 +38,16 @@ export class SalesController {
     async generatePdf(@Param('id') id: string) {
         return this.salesService.generatePdf(id);
     }
+
+    @UseGuards(AuthGuard)
+    @Patch('einvoice/:id')
+    async generateEInvoice(
+        @Param('id') id: string,
+        @Body() updateSaleDto: UpdateSaleDto
+    ) {
+        console.log('id', id, updateSaleDto)
+        return this.salesService.generateEInvoice(id, updateSaleDto);
+    }
     
     @Get('user/:userId')
     async findByUserId(@Param('userId') userId: string) {

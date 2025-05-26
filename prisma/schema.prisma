@@ -118,7 +118,7 @@ model Sale {
   employeeName       String   @db.VarChar(50)
   total              Decimal  @db.Decimal(10, 0)
   date               DateTime @default(now())
-  bill_id            Decimal  @db.Decimal(10, 0)
+  bill_id            Decimal?  @db.Decimal(10, 0)
   number_e_invoice   String?  
   number_credit_note String?  
   cufe               String?  

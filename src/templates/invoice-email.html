@@ -33,8 +33,7 @@
 
       .client-info,
       .employee-info,
-      .invoice-info
-      {
+      .invoice-info {
         margin-bottom: 10px;
       }
 
@@ -106,9 +105,9 @@
       <div class="invoice-info">
         <strong>Fecha:</strong> {{date}}<br />
         <strong>N.º Factura:</strong> {{invoiceNumber}}<br />
-        <strong>Factura Electrónica de Venta No: </strong>{{invoiceENumber}}<br />
-        <strong>CUFE:</strong>{{cufe}}<br />
-
+        <strong>Factura Electrónica de Venta No: </strong
+        >{{invoiceENumber}}<br />
+        <strong>CUFE: </strong>{{cufe}}<br />
       </div>
     </div>
 
@@ -137,13 +136,13 @@
       <p>Total: ${{total}}</p>
     </div>
 
-    <div style="margin-top: 30px; text-align: center;">
+    <div style="margin-top: 30px; text-align: center">
+      {{#qrImage}}
       <p>Escanee el código QR para ver la factura electrónica:</p>
-      <img
-        src="{{qrImage}}"
-        alt="Código QR"
-        style="max-width: 150px;"
-      />
+      <img src="{{qrImage}}" alt="Código QR" style="max-width: 150px" />
+      {{/qrImage}} {{^qrImage}}
+      <p><strong>El código QR no está disponible.</strong></p>
+      {{/qrImage}}
     </div>
 
     <div class="footer">
