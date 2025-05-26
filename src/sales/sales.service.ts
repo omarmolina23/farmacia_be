@@ -170,7 +170,7 @@ export class SalesService {
             );
 
             // Enviar correo al primer cliente (asumiendo uno por venta)
-            /*await this.mailerService.sendMail({
+            await this.mailerService.sendMail({
                 to: clientFound[0].email,
                 subject: `Factura de tu compra - Venta #${saleFinal.id}`,
                 html: `<p>Hola ${clientFound[0].name},</p>
@@ -183,7 +183,7 @@ export class SalesService {
                         contentType: 'application/pdf',
                     },
                 ],
-            });*/
+            });
 
             return {
                 ...saleFinal,
