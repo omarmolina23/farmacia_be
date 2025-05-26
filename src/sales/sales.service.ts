@@ -397,9 +397,8 @@ export class SalesService {
     });
   }
 
-  async returnSale(id: string, updateSaleDto: UpdateSaleDto) {
+  async returnSale(id: string) {
     try {
-      const { number_credit_note } = updateSaleDto;
       const sale = await this.findById(id);
       if (sale) {
         for (const product of sale.products) {
@@ -437,7 +436,6 @@ export class SalesService {
           where: { id },
           data: {
             repaid: true,
-            number_credit_note: number_credit_note,
           },
           include: this.saleInclude,
         });

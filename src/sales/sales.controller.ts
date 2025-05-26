@@ -60,10 +60,9 @@ export class SalesController {
 
     @Patch('return/:id')
     async returnSale(
-        @Param('id') id: string,
-        @Body() updateSaleDto: UpdateSaleDto,
+        @Param('id') id: string
     ) {
-        return await this.salesService.returnSale(id, updateSaleDto);
+        return await this.salesService.returnSale(id);
     }
 
     @Get(':id')
