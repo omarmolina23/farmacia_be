@@ -30,6 +30,7 @@ export class InvoiceService {
             invoiceNumber: invoiceData.sale.id || 'No disponible',
             invoiceENumber: invoiceData.sale.number_e_invoice || 'No disponible',
             cufe: invoiceData.sale.cufe || 'No disponible',
+            cufeLabel: invoiceData.sale.repaid ? 'CUDE' : 'CUFE',
             qrImage: invoiceData.sale.qr_image || '',
             items: invoiceData.detailedProducts,
             total: invoiceData.sale.total.toFixed(2),
