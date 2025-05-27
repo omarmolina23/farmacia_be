@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { InvoiceService } from 'src/invoice/invoice.service';
 import { MailerService } from '@nestjs-modules/mailer';
@@ -51,7 +51,7 @@ export class SalesService {
                     });
 
                     if (!product) {
-                        throw new Error(`Producto con ID ${productId} no encontrado.`);
+                        throw new NotFoundException(`Producto con ID ${productId} no encontrado.`);
                     }
 
                     total += Number(product.price) * amount;
@@ -96,7 +96,7 @@ export class SalesService {
                     });
 
                     if (!batches.length) {
-                        throw new Error(`No hay lotes disponibles para el producto ${productId}`);
+                        throw new BadRequestException(`No hay lotes disponibles para el producto ${productId}`);
                     }
 
                     // Crear relación SaleProductClient
@@ -137,7 +137,7 @@ export class SalesService {
                     }
 
                     if (remaining > 0) {
-                        throw new Error(`Stock insuficiente para el producto ${productId}. Faltan ${remaining} unidades.`);
+                        throw new BadRequestException(`Stock insuficiente para el producto ${productId}. Faltan ${remaining} unidades.`);
                     }
 
                     const client = await tx.client.findUnique({
@@ -146,7 +146,7 @@ export class SalesService {
                     });
 
                     if (!client) {
-                        throw new Error(`Cliente con ID ${rest.clientId} no encontrado.`);
+                        throw new BadRequestException(`Cliente con ID ${rest.clientId} no encontrado.`);
                     }
 
                     clientFound.push({
