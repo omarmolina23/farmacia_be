@@ -179,72 +179,82 @@ export class DashboardService {
 
   async getProductsSold() {
     try {
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
+      const today = new Date();
 
-      const todayEnd = new Date();
-      todayEnd.setHours(23, 59, 59, 999);
+      // Últimos 30 días (mes actual)
+      const last30DaysStart = subDays(today, 30);
+      const last30DaysEnd = today;
 
-      const yesterdayStart = new Date(todayStart);
-      yesterdayStart.setDate(todayStart.getDate() - 1);
+      // Los 30 días anteriores a los últimos 30 días (mes anterior)
+      const previous30DaysStart = subDays(last30DaysStart, 30);
+      const previous30DaysEnd = last30DaysStart;
 
-      const yesterdayEnd = new Date(todayEnd);
-      yesterdayEnd.setDate(todayEnd.getDate() - 1);
-
-      // Obtener IDs de ventas de hoy
-      const salesToday = await this.prisma.sale.findMany({
-        where: { date: { gte: todayStart, lte: todayEnd } },
+      // Obtener IDs de ventas de los últimos 30 días (sin repaid)
+      const recentSales = await this.prisma.sale.findMany({
+        where: {
+          date: {
+            gte: last30DaysStart,
+            lt: last30DaysEnd,
+          },
+          repaid: false,
+        },
         select: { id: true },
       });
-      const saleIdsToday = salesToday.map((s) => s.id);
+      const saleIdsRecent = recentSales.map((s) => s.id);
 
-      // Obtener IDs de ventas de ayer
-      const salesYesterday = await this.prisma.sale.findMany({
-        where: { date: { gte: yesterdayStart, lte: yesterdayEnd } },
+      // Obtener IDs de ventas de los 30 días anteriores (sin repaid)
+      const pastSales = await this.prisma.sale.findMany({
+        where: {
+          date: {
+            gte: previous30DaysStart,
+            lt: previous30DaysEnd,
+          },
+          repaid: false,
+        },
         select: { id: true },
       });
-      const saleIdsYesterday = salesYesterday.map((s) => s.id);
+      const saleIdsPast = pastSales.map((s) => s.id);
 
-      // Agrupar productos vendidos hoy por productId sumando amount
-      const productsToday = await this.prisma.saleProductClient.groupBy({
+      // Agrupar productos vendidos en los últimos 30 días
+      const productsRecent = await this.prisma.saleProductClient.groupBy({
         by: ['productId'],
-        where: { saleId: { in: saleIdsToday } },
+        where: { saleId: { in: saleIdsRecent } },
         _sum: { amount: true },
         orderBy: { _sum: { amount: 'desc' } },
         take: 5,
       });
 
-      // Agrupar productos vendidos ayer
-      const productsYesterday = await this.prisma.saleProductClient.groupBy({
+      // Agrupar productos vendidos en los 30 días anteriores
+      const productsPast = await this.prisma.saleProductClient.groupBy({
         by: ['productId'],
-        where: { saleId: { in: saleIdsYesterday } },
+        where: { saleId: { in: saleIdsPast } },
         _sum: { amount: true },
       });
 
-      // Mapa para buscar ventas de ayer
-      const yesterdayMap = new Map(
-        productsYesterday.map((p) => [p.productId, p._sum.amount ?? 0]),
+      // Mapa para buscar ventas del mes anterior
+      const pastMap = new Map(
+        productsPast.map((p) => [p.productId, p._sum.amount ?? 0]),
       );
 
-      // Total ventas cantidad hoy y ayer
-      const totalToday = productsToday.reduce(
+      // Totales vendidos
+      const totalRecent = productsRecent.reduce(
         (sum, p) => sum + (p._sum.amount ?? 0),
         0,
       );
-      const totalYesterday = productsYesterday.reduce(
+      const totalPast = productsPast.reduce(
         (sum, p) => sum + (p._sum.amount ?? 0),
         0,
       );
 
-      // Obtener nombres de productos para el top de hoy
-      const productIds = productsToday.map((p) => p.productId);
+      // Obtener nombres de los productos top
+      const productIds = productsRecent.map((p) => p.productId);
       const productsInfo = await this.prisma.product.findMany({
         where: { id: { in: productIds } },
         select: { id: true, name: true },
       });
 
-      // Armar arreglo con nombre y cantidad vendida
-      const products = productsToday.map((p) => {
+      // Armar resultado
+      const products = productsRecent.map((p) => {
         const prodInfo = productsInfo.find((pi) => pi.id === p.productId);
         return {
           product: prodInfo?.name || 'Desconocido',
@@ -252,11 +262,7 @@ export class DashboardService {
         };
       });
 
-      // Calcular porcentaje de cambio
-      const percentChange = this.getPercentageChange(
-        totalToday,
-        totalYesterday,
-      );
+      const percentChange = this.getPercentageChange(totalRecent, totalPast);
 
       return { products, percentChange };
     } catch (error) {
@@ -349,6 +355,7 @@ export class DashboardService {
             date: {
               gte: subDays(new Date(), 90), // últimos 90 días
             },
+            repaid: false,
           },
         },
       });
