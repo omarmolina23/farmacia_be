@@ -267,19 +267,29 @@ export class ProductsService {
     });
   }
 
-  async getWeeklySalesLast3Months(id: string) {
+  async getWeeklySalesLast6Months(id: string) {
     try {
       const now = new Date();
-      const threeMonthsAgo = subMonths(now, 3);
+      const sixMonthsAgo = subMonths(now, 6);
 
-      // Obtiene todas las ventas del producto en los últimos 3 meses
+      // Verificar si el producto existe
+      const productExists = await this.prisma.product.findUnique({
+        where: { id },
+      });
+
+      if (!productExists) {
+        throw new NotFoundException('Producto no encontrado');
+      }
+
+      // Obtiene todas las ventas del producto en los últimos 6 meses
       const sales = await this.prisma.saleProductClient.findMany({
         where: {
-          id,
+          productId: id,
           venta: {
             date: {
-              gte: threeMonthsAgo,
+              gte: sixMonthsAgo,
             },
+            repaid: false, // Asegura que no se incluyan ventas reembolsadas
           },
         },
         select: {
