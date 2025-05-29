@@ -317,7 +317,7 @@ export class ProductsService {
       // Asegura que estén las 24 semanas (incluso si no hubo ventas)
       const result: { week: string; totalSales: number }[] = [];
       for (let i = 0; i < 24; i++) {
-        const weekStart = startOfWeek(subMonths(now, 3), { weekStartsOn: 1 });
+        const weekStart = startOfWeek(sixMonthsAgo, { weekStartsOn: 1 });
         const currentWeekStart = new Date(
           weekStart.getTime() + i * 7 * 24 * 60 * 60 * 1000,
         );
