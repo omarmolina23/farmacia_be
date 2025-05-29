@@ -18,7 +18,7 @@ import { Roles } from 'src/auth/validators/roles.decorator';
 
 @Controller('category')
 export class CategoryController {
-  constructor(private categoryService: CategoryService) { }
+  constructor(private categoryService: CategoryService) {}
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
@@ -35,10 +35,13 @@ export class CategoryController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @Get('search')
-  search(
-    @Query('query') query?: string,
-  ) {
+  search(@Query('query') query?: string) {
     return this.categoryService.findByName(query);
+  }
+
+  @Get('sales-category')
+  async getSalesCategory() {
+    return await this.categoryService.getSalesByCategoryWeekly();
   }
 
   @UseGuards(AuthGuard, RolesGuard)
@@ -57,6 +60,4 @@ export class CategoryController {
   remove(@Param('id') id: string) {
     return this.categoryService.remove(id);
   }
-
-
 }
