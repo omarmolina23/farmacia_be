@@ -168,6 +168,11 @@ export class ProductsController {
     return this.productsService.getWeeklySalesLast6Months(id);
   }
 
+  @Get('stock-summary')
+  getStockSummary() {
+    return this.productsService.getProductStockSummary();
+  }
+
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @Patch(':id')

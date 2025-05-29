@@ -334,6 +334,52 @@ export class ProductsService {
     }
   }
 
+  async getProductStockSummary() {
+    try {
+      const products = await this.prisma.product.findMany({
+        where: {
+          status: 'ACTIVE',
+          batches: {
+            some: {
+              status: 'ACTIVE',
+              isExpired: false,
+            },
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          batches: {
+            where: {
+              status: 'ACTIVE',
+              isExpired: false,
+            },
+            select: {
+              available_amount: true,
+            },
+          },
+        },
+      });
+
+      const result = products.map((product) => {
+        const stock = product.batches.reduce(
+          (total, batch) => total + batch.available_amount,
+          0,
+        );
+
+        return {
+          id: product.id,
+          name: product.name,
+          stock,
+        };
+      });
+
+      return result;
+    } catch (error) {
+      throw new BadRequestException('Error al obtener el stock por producto');
+    }
+  }
+
   async findFilteredProducts(
     categories?: string[],
     suppliers?: string[],
