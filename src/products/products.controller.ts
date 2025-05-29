@@ -53,7 +53,7 @@ function extractImagesFromBody(body: Record<string, any>) {
 
 @Controller('product')
 export class ProductsController {
-  constructor(private productsService: ProductsService) { }
+  constructor(private productsService: ProductsService) {}
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
@@ -137,7 +137,7 @@ export class ProductsController {
     @Query('tag') tag?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
-    @Query('query') query?: string
+    @Query('query') query?: string,
   ) {
     const categoryArray = category ? category.split(',') : [];
     const supplierArray = supplier ? supplier.split(',') : [];
@@ -149,7 +149,7 @@ export class ProductsController {
       tagArray,
       minPrice ? Number(minPrice) : undefined,
       maxPrice ? Number(maxPrice) : undefined,
-      query
+      query,
     );
   }
 
@@ -161,6 +161,11 @@ export class ProductsController {
   @Get('search/name')
   findByNameOnly(@Query('query') query: string) {
     return this.productsService.findByNameOnly(query);
+  }
+
+  @Get('weekly-sales/:id')
+  getWeeklySalesByProduct(@Param('id') id: string) {
+    return this.productsService.getWeeklySalesLast3Months(id);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
