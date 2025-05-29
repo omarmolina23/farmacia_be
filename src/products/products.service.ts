@@ -10,6 +10,7 @@ import { Image, ImagesDto } from './dto/images.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 import { v4 as uuid } from 'uuid';
+import { subMonths, startOfWeek, endOfWeek } from 'date-fns';
 
 type UploadedFile = {
   filename: string;
@@ -264,6 +265,63 @@ export class ProductsService {
         },
       },
     });
+  }
+
+  async getWeeklySalesLast3Months(id: string) {
+    try {
+      const now = new Date();
+      const threeMonthsAgo = subMonths(now, 3);
+
+      // Obtiene todas las ventas del producto en los últimos 3 meses
+      const sales = await this.prisma.saleProductClient.findMany({
+        where: {
+          id,
+          venta: {
+            date: {
+              gte: threeMonthsAgo,
+            },
+          },
+        },
+        select: {
+          amount: true,
+          venta: {
+            select: {
+              date: true,
+            },
+          },
+        },
+      });
+
+      // Agrupa por semana usando un Map
+      const weeksMap = new Map<string, number>();
+
+      for (const sale of sales) {
+        const saleDate = new Date(sale.venta.date);
+        const start = startOfWeek(saleDate, { weekStartsOn: 1 }); // lunes como inicio de semana
+        const weekKey = start.toISOString().split('T')[0]; // ej. '2025-03-10'
+
+        const prevCount = weeksMap.get(weekKey) || 0;
+        weeksMap.set(weekKey, prevCount + sale.amount);
+      }
+
+      // Asegura que estén las 12 semanas (incluso si no hubo ventas)
+      const result: { week: string; totalSales: number }[] = [];
+      for (let i = 11; i >= 0; i--) {
+        const weekStart = startOfWeek(subMonths(now, 3), { weekStartsOn: 1 });
+        const currentWeekStart = new Date(
+          weekStart.getTime() + i * 7 * 24 * 60 * 60 * 1000,
+        );
+        const key = currentWeekStart.toISOString().split('T')[0];
+        result.push({
+          week: key,
+          totalSales: weeksMap.get(key) || 0,
+        });
+      }
+
+      return result;
+    } catch (error) {
+      throw new BadRequestException('Error al obtener las ventas semanales');
+    }
   }
 
   async findFilteredProducts(
