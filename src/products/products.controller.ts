@@ -165,7 +165,7 @@ export class ProductsController {
 
   @Get('weekly-sales/:id')
   getWeeklySalesByProduct(@Param('id') id: string) {
-    return this.productsService.getWeeklySalesLast3Months(id);
+    return this.productsService.getWeeklySalesLast6Months(id);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
