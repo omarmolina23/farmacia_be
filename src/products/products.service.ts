@@ -10,7 +10,7 @@ import { Image, ImagesDto } from './dto/images.dto';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 import { v4 as uuid } from 'uuid';
-import { subMonths, startOfWeek, endOfWeek } from 'date-fns';
+import { subWeeks, startOfWeek } from 'date-fns';
 
 type UploadedFile = {
   filename: string;
@@ -270,7 +270,7 @@ export class ProductsService {
   async getWeeklySalesLast6Months(id: string) {
     try {
       const now = new Date();
-      const sixMonthsAgo = subMonths(now, 6);
+      const sixMonthsAgo = startOfWeek(subWeeks(now, 23), { weekStartsOn: 1 });
 
       // Verificar si el producto existe
       const productExists = await this.prisma.product.findUnique({
@@ -316,12 +316,13 @@ export class ProductsService {
 
       // Asegura que estén las 24 semanas (incluso si no hubo ventas)
       const result: { week: string; totalSales: number }[] = [];
-      for (let i = 0; i < 24; i++) {
-        const weekStart = startOfWeek(sixMonthsAgo, { weekStartsOn: 1 });
-        const currentWeekStart = new Date(
-          weekStart.getTime() + i * 7 * 24 * 60 * 60 * 1000,
+      const currentWeekStart = startOfWeek(now, { weekStartsOn: 1 });
+
+      for (let i = 23; i >= 0; i--) {
+        const weekStart = new Date(
+          currentWeekStart.getTime() - i * 7 * 24 * 60 * 60 * 1000,
         );
-        const key = currentWeekStart.toISOString().split('T')[0];
+        const key = weekStart.toISOString().split('T')[0];
         result.push({
           week: key,
           totalSales: weeksMap.get(key) || 0,
