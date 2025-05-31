@@ -82,12 +82,14 @@ export class DashboardService {
       const salesToday = await this.prisma.sale.count({
         where: {
           date: { gte: todayStart, lte: todayEnd },
+          repaid: false,
         },
       });
 
       const salesYesterday = await this.prisma.sale.count({
         where: {
           date: { gte: yesterdayStart, lte: yesterdayEnd },
+          repaid: false,
         },
       });
 
@@ -153,6 +155,9 @@ export class DashboardService {
         take: 5,
         orderBy: {
           date: 'desc',
+        },
+        where: {
+          repaid: false,
         },
         select: {
           date: true,
