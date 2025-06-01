@@ -102,6 +102,7 @@ export class DashboardService {
         },
         where: {
           date: { gte: todayStart, lte: todayEnd },
+          repaid: false,
         },
       });
 
@@ -111,6 +112,7 @@ export class DashboardService {
         },
         where: {
           date: { gte: yesterdayStart, lte: yesterdayEnd },
+          repaid: false,
         },
       });
 
