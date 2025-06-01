@@ -371,6 +371,9 @@ export class SalesService {
     const { start: gte } = getStartEndOfDayInColombia(startDate);
     const { end: lte } = getStartEndOfDayInColombia(endDate);
 
+    console.log('Fecha de inicio:', gte);
+    console.log('Fecha de fin:', lte);
+
     if (repaid === undefined) {
       repaid = false;
     }
