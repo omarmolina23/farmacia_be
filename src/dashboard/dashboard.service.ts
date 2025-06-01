@@ -476,9 +476,9 @@ export class DashboardService {
       const now = new Date();
 
       const periods = {
-        ultimos_7_dias: {
-          start: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
-          prevStart: new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000),
+        ultimos_15_dias: {
+          start: new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000),
+          prevStart: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
         },
         ultimos_30_dias: {
           start: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
