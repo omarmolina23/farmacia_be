@@ -20,12 +20,11 @@ export class DashboardService {
     try {
       const now = new Date();
       const { start: todayStart, end: todayEnd } = getStartEndOfDayInColombia(now);
-      console.log(todayStart, todayEnd);
 
       const yesterday = new Date(now);
       yesterday.setDate(now.getDate() - 1);
       const { start: yesterdayStart, end: yesterdayEnd } = getStartEndOfDayInColombia(yesterday);
-      console.log(yesterdayStart, yesterdayEnd);
+
       // CLIENTES (únicos que compraron hoy)
       const clientsToday = await this.prisma.sale.findMany({
         where: {
