@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { subDays, startOfWeek, format } from 'date-fns';
+import { getStartEndOfDayInColombia } from 'src/utils/date';
 
 @Injectable()
 export class DashboardService {
@@ -17,17 +18,12 @@ export class DashboardService {
 
   async getDailyStatus() {
     try {
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
+      const now = new Date();
+      const { start: todayStart, end: todayEnd } = getStartEndOfDayInColombia(now);
 
-      const todayEnd = new Date();
-      todayEnd.setHours(23, 59, 59, 999);
-
-      const yesterdayStart = new Date(todayStart);
-      yesterdayStart.setDate(todayStart.getDate() - 1);
-
-      const yesterdayEnd = new Date(todayEnd);
-      yesterdayEnd.setDate(todayEnd.getDate() - 1);
+      const yesterday = new Date(now);
+      yesterday.setDate(now.getDate() - 1);
+      const { start: yesterdayStart, end: yesterdayEnd } = getStartEndOfDayInColombia(yesterday);
 
       // CLIENTES (únicos que compraron hoy)
       const clientsToday = await this.prisma.sale.findMany({
