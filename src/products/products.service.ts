@@ -275,7 +275,7 @@ export class ProductsService {
         now.toLocaleString('en-US', { timeZone: 'America/Bogota' }),
       );
       const { start: todayStart } = getStartEndOfDayInColombia(colombiaNow);
-      const sixMonthsAgo = startOfWeek(subWeeks(todayStart, 23), {
+      const sixMonthsAgo = startOfWeek(subWeeks(todayStart, 24), {
         weekStartsOn: 1,
       });
 

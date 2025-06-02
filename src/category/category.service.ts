@@ -124,7 +124,7 @@ export class CategoryService {
           currentWeekStart.getTime() - i * 7 * 24 * 60 * 60 * 1000,
         );
         const previousWeek = new Date(
-          currentWeek.getTime() - 7 * 24 * 60 * 60 * 1000,
+          currentWeek.getTime() + 7 * 24 * 60 * 60 * 1000,
         );
 
         const currentWeekKey = currentWeek.toISOString().split('T')[0];
