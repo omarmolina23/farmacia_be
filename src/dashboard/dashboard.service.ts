@@ -19,12 +19,16 @@ export class DashboardService {
   async getDailyStatus() {
     try {
       const now = new Date();
-      const colombiaNow = new Date(now.toLocaleString("en-US", { timeZone: "America/Bogota" }));
-      const { start: todayStart, end: todayEnd } = getStartEndOfDayInColombia(colombiaNow);
+      const colombiaNow = new Date(
+        now.toLocaleString('en-US', { timeZone: 'America/Bogota' }),
+      );
+      const { start: todayStart, end: todayEnd } =
+        getStartEndOfDayInColombia(colombiaNow);
 
       const yesterday = new Date(colombiaNow);
       yesterday.setDate(yesterday.getDate() - 1);
-      const { start: yesterdayStart, end: yesterdayEnd } = getStartEndOfDayInColombia(yesterday);
+      const { start: yesterdayStart, end: yesterdayEnd } =
+        getStartEndOfDayInColombia(yesterday);
 
       // CLIENTES (únicos que compraron hoy)
       const clientsToday = await this.prisma.sale.findMany({
@@ -473,19 +477,22 @@ export class DashboardService {
     try {
       // Fechas actuales y pasadas para cada periodo y su periodo anterior para % cambio
       const now = new Date();
+      const colombiaNow = new Date(
+        now.toLocaleString('en-US', { timeZone: 'America/Bogota' }),
+      );
 
       const periods = {
         ultimos_15_dias: {
-          start: new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000),
-          prevStart: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
+          start: new Date(colombiaNow.getTime() - 15 * 24 * 60 * 60 * 1000),
+          prevStart: new Date(colombiaNow.getTime() - 30 * 24 * 60 * 60 * 1000),
         },
         ultimos_30_dias: {
-          start: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
-          prevStart: new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000),
+          start: new Date(colombiaNow.getTime() - 30 * 24 * 60 * 60 * 1000),
+          prevStart: new Date(colombiaNow.getTime() - 60 * 24 * 60 * 60 * 1000),
         },
         ultimos_3_meses: {
-          start: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000),
-          prevStart: new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000),
+          start: new Date(colombiaNow.getTime() - 90 * 24 * 60 * 60 * 1000),
+          prevStart: new Date(colombiaNow.getTime() - 180 * 24 * 60 * 60 * 1000),
         },
       };
 
@@ -497,7 +504,7 @@ export class DashboardService {
         const period = periods[key];
         const start = period.start;
         const prevStart = period.prevStart;
-        const end = now;
+        const end = colombiaNow;
         const prevEnd = period.start;
 
         // Ganancias en el periodo actual
