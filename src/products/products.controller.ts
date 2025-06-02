@@ -248,4 +248,11 @@ export class ProductsController {
   remove(@Param('id') id: string) {
     return this.productsService.remove(id);
   }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
+  @Patch('enable/:id')
+  enable(@Param('id') id: string) {
+    return this.productsService.enable(id);
+  }
 }
