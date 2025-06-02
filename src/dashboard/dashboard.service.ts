@@ -19,10 +19,11 @@ export class DashboardService {
   async getDailyStatus() {
     try {
       const now = new Date();
-      const { start: todayStart, end: todayEnd } = getStartEndOfDayInColombia(now);
+      const colombiaNow = new Date(now.toLocaleString("en-US", { timeZone: "America/Bogota" }));
+      const { start: todayStart, end: todayEnd } = getStartEndOfDayInColombia(colombiaNow);
 
-      const yesterday = new Date(now);
-      yesterday.setDate(now.getDate() - 1);
+      const yesterday = new Date(colombiaNow);
+      yesterday.setDate(yesterday.getDate() - 1);
       const { start: yesterdayStart, end: yesterdayEnd } = getStartEndOfDayInColombia(yesterday);
 
       // CLIENTES (únicos que compraron hoy)
