@@ -97,7 +97,10 @@ export class CategoryService {
 
       for (const sale of salesWithCategories) {
         const saleDate = new Date(sale.venta.date);
-        const weekStart = startOfWeek(saleDate, { weekStartsOn: 1 });
+        const saleDateColombia = new Date(
+          saleDate.toLocaleString('en-US', { timeZone: 'America/Bogota' }),
+        );
+        const weekStart = startOfWeek(saleDateColombia, { weekStartsOn: 1 });
         const weekKey = weekStart.toISOString().split('T')[0];
         const category = sale.products.category.name;
 
@@ -120,7 +123,8 @@ export class CategoryService {
         );
         const weekKey = weekDate.toISOString().split('T')[0];
 
-        const weekData: { week: string; [category: string]: number | string } = { week: weekKey };
+        const weekData: { week: string; [category: string]: number | string } =
+          { week: weekKey };
 
         for (const category of allCategories) {
           weekData[category] = grouped.get(weekKey)?.[category] || 0;
