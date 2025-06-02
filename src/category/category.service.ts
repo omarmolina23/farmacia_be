@@ -8,11 +8,12 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create.category';
 import { UpdateCategoryDto } from './dto/update.category';
 
-import { subDays, startOfWeek, format } from 'date-fns';
+import { subDays, subWeeks, startOfWeek, format } from 'date-fns';
+import { getStartEndOfDayInColombia } from 'src/utils/date';
 
 @Injectable()
 export class CategoryService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
     try {
@@ -41,74 +42,100 @@ export class CategoryService {
           mode: 'insensitive',
         },
       },
-    })
+    });
 
     return category;
   }
 
   async getSalesByCategoryWeekly() {
-      try {
-        // Obtener todas las ventas con sus productos y categorías dentro de un rango razonable (ejemplo últimos 3 meses)
-        const salesWithProducts = await this.prisma.saleProductClient.findMany({
-          select: {
-            amount: true,
-            venta: {
-              select: {
-                date: true,
-              },
+    try {
+      const now = new Date();
+      const colombiaNow = new Date(
+        now.toLocaleString('en-US', { timeZone: 'America/Bogota' }),
+      );
+      const { start: todayStart } = getStartEndOfDayInColombia(colombiaNow);
+      const sixMonthsAgo = startOfWeek(subWeeks(todayStart, 23), {
+        weekStartsOn: 1,
+      });
+      // Obtener todas las ventas con sus productos y categorías dentro de un rango razonable (ejemplo últimos 3 meses)
+      const salesWithCategories = await this.prisma.saleProductClient.findMany({
+        select: {
+          amount: true,
+          venta: {
+            select: {
+              date: true,
             },
-            products: {
-              select: {
-                category: {
-                  select: {
-                    name: true,
-                  },
+          },
+          products: {
+            select: {
+              category: {
+                select: {
+                  name: true,
                 },
               },
             },
           },
-          where: {
-            venta: {
-              date: {
-                gte: subDays(new Date(), 180), // últimos 180 días
-              },
-              repaid: false,
+        },
+        where: {
+          venta: {
+            date: {
+              gte: sixMonthsAgo, // últimos 6 meses
             },
+            repaid: false,
           },
-        });
-  
-        // Agrupar por semana y categoría
-        const grouped: Record<string, Record<string, number>> = {}; // { "2025-01-11": { analgésicos: 146, ... } }
-  
-        for (const item of salesWithProducts) {
-          // Fecha de la venta
-          const saleDate = item.venta.date;
-          // Obtener el inicio de la semana (lunes)
-          const weekStart = startOfWeek(saleDate, { weekStartsOn: 1 }); // lunes como inicio de semana
-          const weekKey = format(weekStart, 'yyyy-MM-dd');
-  
-          // Nombre categoría (ejemplo: "analgésicos")
-          const categoryName = item.products.category.name;
-  
-          if (!grouped[weekKey]) grouped[weekKey] = {};
-          if (!grouped[weekKey][categoryName]) grouped[weekKey][categoryName] = 0;
-  
-          grouped[weekKey][categoryName] += item.amount;
-        }
-  
-        // Convertir el objeto agrupado a arreglo
-        const result = Object.entries(grouped).map(([date, categories]) => ({
-          date,
-          ...categories,
-        }));
-  
-        return result;
-      } catch (error) {
-        throw new BadRequestException(
-          'Error al obtener las ventas por categoría semanal',
-        );
+        },
+      });
+
+      // Obtener el conjunto de todas las categorías presentes
+      const allCategories = new Set<string>();
+      for (const sale of salesWithCategories) {
+        allCategories.add(sale.products.category.name);
       }
+
+      // Agrupar ventas por semana y categoría
+      const grouped = new Map<string, Record<string, number>>();
+
+      for (const sale of salesWithCategories) {
+        const saleDate = new Date(sale.venta.date);
+        const weekStart = startOfWeek(saleDate, { weekStartsOn: 1 });
+        const weekKey = weekStart.toISOString().split('T')[0];
+        const category = sale.products.category.name;
+
+        if (!grouped.has(weekKey)) {
+          grouped.set(weekKey, {});
+        }
+
+        const weekEntry = grouped.get(weekKey)!;
+        weekEntry[category] = (weekEntry[category] || 0) + sale.amount;
+      }
+
+      // Construir resultado final asegurando todas las categorías
+      const result: { week: string; [category: string]: number | string }[] =
+        [];
+      const currentWeekStart = startOfWeek(todayStart, { weekStartsOn: 1 });
+
+      for (let i = 23; i >= 0; i--) {
+        const weekDate = new Date(
+          currentWeekStart.getTime() - i * 7 * 24 * 60 * 60 * 1000,
+        );
+        const weekKey = weekDate.toISOString().split('T')[0];
+
+        const weekData: { week: string; [category: string]: number | string } = { week: weekKey };
+
+        for (const category of allCategories) {
+          weekData[category] = grouped.get(weekKey)?.[category] || 0;
+        }
+
+        result.push(weekData);
+      }
+
+      return result;
+    } catch (error) {
+      throw new BadRequestException(
+        'Error al obtener las ventas por categoría semanal',
+      );
     }
+  }
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {
     const updateUser = await this.prisma.category.update({
@@ -121,7 +148,9 @@ export class CategoryService {
     });
 
     if (!updateUser) {
-      throw new NotFoundException(`La categoría con ID ${id} no fue encontrada`);
+      throw new NotFoundException(
+        `La categoría con ID ${id} no fue encontrada`,
+      );
     }
 
     return updateUser;
@@ -132,16 +161,17 @@ export class CategoryService {
       const category = await this.prisma.category.findUnique({ where: { id } });
 
       if (!category) {
-        throw new NotFoundException(`La categoría con ID ${id} no fue encontrada`);
+        throw new NotFoundException(
+          `La categoría con ID ${id} no fue encontrada`,
+        );
       }
 
       return await this.prisma.category.update({
         where: { id },
         data: { status: 'INACTIVE' },
-      })
+      });
     } catch (error) {
       throw error;
     }
-
   }
 }
