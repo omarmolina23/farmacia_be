@@ -76,15 +76,13 @@ export class DashboardService {
       const inventoryChange = 0;
 
       // ======= VENTAS =======
-      console.log("now: ", todayStart, todayEnd);
       const salesToday = await this.prisma.sale.count({
         where: {
           date: { gte: todayStart, lte: todayEnd },
           repaid: false,
         },
       });
-      console.log(salesToday); // Para depuración, puedes eliminar esta línea en producción
-      console.log("yesterday: ", yesterdayStart, yesterdayEnd);
+
       const salesYesterday = await this.prisma.sale.count({
         where: {
           date: { gte: yesterdayStart, lte: yesterdayEnd },
