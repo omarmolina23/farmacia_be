@@ -311,4 +311,24 @@ export class AuthService {
       throw error;
     }
   }
+
+  async me(token: string) {
+    try {
+      const decoded = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET,
+      }) as { id: string; sub: string };
+      const user = await this.usersService.findOne(decoded.id);
+      return user;
+    } catch (error) {
+      if (
+        error.name === 'JsonWebTokenError' ||
+        error.name === 'TokenExpiredError'
+      ) {
+        throw new UnauthorizedException('Token inválido o expirado');
+      }
+      throw error;
+    }
+  }
+
+  
 }

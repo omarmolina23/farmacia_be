@@ -1,4 +1,4 @@
-import { Body, Res, Query, Controller, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Res, Query, Controller, Get, Post, UseGuards, Req } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginUserDto } from 'src/users/dto/login-user.dto';
 import { SetPasswordUserDto } from 'src/users/dto/set-password-user.dto';
@@ -11,6 +11,12 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 export class AuthController {
 
     constructor(private readonly authService: AuthService) { }
+
+    @Post('me')
+    me(@Body('token') token: string) {
+        // Implement your logic here, for example:
+        return this.authService.me(token);
+    }
 
     @Post('login')
     login(
