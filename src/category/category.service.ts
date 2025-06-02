@@ -101,8 +101,7 @@ export class CategoryService {
           saleDate.toLocaleString('en-US', { timeZone: 'America/Bogota' }),
         );
         const weekStart = startOfWeek(saleDateColombia, { weekStartsOn: 1 });
-        const displayWeek = addWeeks(weekStart, 1);
-        const weekKey = displayWeek.toISOString().split('T')[0];
+        const weekKey = weekStart.toISOString().split('T')[0];
 
         const category = sale.products.category.name;
 
@@ -124,7 +123,7 @@ export class CategoryService {
           currentWeekStart.getTime() - i * 7 * 24 * 60 * 60 * 1000,
         );
         const previousWeek = new Date(
-          currentWeek.getTime() + 7 * 24 * 60 * 60 * 1000,
+          currentWeek.getTime() - 7 * 24 * 60 * 60 * 1000,
         );
 
         const currentWeekKey = currentWeek.toISOString().split('T')[0];
