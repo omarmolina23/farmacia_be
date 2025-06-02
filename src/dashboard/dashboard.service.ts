@@ -339,6 +339,13 @@ export class DashboardService {
 
   async getSalesByCategoryWeekly() {
     try {
+      const now = new Date();
+      const colombiaNow = new Date(
+        now.toLocaleString('en-US', { timeZone: 'America/Bogota' }),
+      );
+
+      // Calcular la fecha límite hace 90 días desde la fecha en Colombia
+      const ninetyDaysAgo = subDays(colombiaNow, 90);
       // Obtener todas las ventas con sus productos y categorías dentro de un rango razonable (ejemplo últimos 3 meses)
       const salesWithProducts = await this.prisma.saleProductClient.findMany({
         select: {
@@ -361,7 +368,7 @@ export class DashboardService {
         where: {
           venta: {
             date: {
-              gte: subDays(new Date(), 90), // últimos 90 días
+              gte: ninetyDaysAgo, // últimos 90 días
             },
             repaid: false,
           },
@@ -492,7 +499,9 @@ export class DashboardService {
         },
         ultimos_3_meses: {
           start: new Date(colombiaNow.getTime() - 90 * 24 * 60 * 60 * 1000),
-          prevStart: new Date(colombiaNow.getTime() - 180 * 24 * 60 * 60 * 1000),
+          prevStart: new Date(
+            colombiaNow.getTime() - 180 * 24 * 60 * 60 * 1000,
+          ),
         },
       };
 
