@@ -8,7 +8,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create.category';
 import { UpdateCategoryDto } from './dto/update.category';
 
-import { subDays, subWeeks, startOfWeek, format } from 'date-fns';
+import { subDays, subWeeks, startOfWeek, addWeeks, format } from 'date-fns';
 import { getStartEndOfDayInColombia } from 'src/utils/date';
 
 @Injectable()
@@ -54,7 +54,7 @@ export class CategoryService {
         now.toLocaleString('en-US', { timeZone: 'America/Bogota' }),
       );
       const { start: todayStart } = getStartEndOfDayInColombia(colombiaNow);
-      const sixMonthsAgo = startOfWeek(subWeeks(todayStart, 23), {
+      const sixMonthsAgo = startOfWeek(subWeeks(todayStart, 24), {
         weekStartsOn: 1,
       });
       // Obtener todas las ventas con sus productos y categorías dentro de un rango razonable (ejemplo últimos 3 meses)
@@ -101,7 +101,9 @@ export class CategoryService {
           saleDate.toLocaleString('en-US', { timeZone: 'America/Bogota' }),
         );
         const weekStart = startOfWeek(saleDateColombia, { weekStartsOn: 1 });
-        const weekKey = weekStart.toISOString().split('T')[0];
+        const displayWeek = addWeeks(weekStart, 1);
+        const weekKey = displayWeek.toISOString().split('T')[0];
+
         const category = sale.products.category.name;
 
         if (!grouped.has(weekKey)) {
@@ -118,16 +120,21 @@ export class CategoryService {
       const currentWeekStart = startOfWeek(todayStart, { weekStartsOn: 1 });
 
       for (let i = 23; i >= 0; i--) {
-        const weekDate = new Date(
+        const currentWeek = new Date(
           currentWeekStart.getTime() - i * 7 * 24 * 60 * 60 * 1000,
         );
-        const weekKey = weekDate.toISOString().split('T')[0];
+        const previousWeek = new Date(
+          currentWeek.getTime() - 7 * 24 * 60 * 60 * 1000,
+        );
+
+        const currentWeekKey = currentWeek.toISOString().split('T')[0];
+        const previousWeekKey = previousWeek.toISOString().split('T')[0];
 
         const weekData: { week: string; [category: string]: number | string } =
-          { week: weekKey };
+          { week: currentWeekKey };
 
         for (const category of allCategories) {
-          weekData[category] = grouped.get(weekKey)?.[category] || 0;
+          weekData[category] = grouped.get(previousWeekKey)?.[category] || 0;
         }
 
         result.push(weekData);
