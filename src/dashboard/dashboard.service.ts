@@ -381,8 +381,11 @@ export class DashboardService {
       for (const item of salesWithProducts) {
         // Fecha de la venta
         const saleDate = item.venta.date;
+        const saleDateColombia = new Date(
+          saleDate.toLocaleString('en-US', { timeZone: 'America/Bogota' }),
+        );
         // Obtener el inicio de la semana (lunes)
-        const weekStart = startOfWeek(saleDate, { weekStartsOn: 1 }); // lunes como inicio de semana
+        const weekStart = startOfWeek(saleDateColombia, { weekStartsOn: 1 }); // lunes como inicio de semana
         const weekKey = format(weekStart, 'yyyy-MM-dd');
 
         // Nombre categoría (ejemplo: "analgésicos")
