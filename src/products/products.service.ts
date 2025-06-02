@@ -568,4 +568,21 @@ export class ProductsService {
       throw error;
     }
   }
+
+  async enable(id: string) {
+    try {
+      const product = await this.prisma.product.findUnique({ where: { id } });
+
+      if (!product) {
+        throw new NotFoundException('Producto no encontrado');
+      }
+
+      return await this.prisma.product.update({
+        where: { id },
+        data: { status: 'ACTIVE' },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 }

@@ -14,7 +14,6 @@ export class AuthController {
 
     @Post('me')
     me(@Body('token') token: string) {
-        // Implement your logic here, for example:
         return this.authService.me(token);
     }
 
