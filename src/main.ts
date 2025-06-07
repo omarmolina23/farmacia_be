@@ -45,18 +45,18 @@ async function bootstrap() {
 
   app.useGlobalFilters(new FileSizeExceptionFilter());
   app.useGlobalPipes(
-  new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-    exceptionFactory: (errors) => {
-      const messages = errors.map((error) =>
-        error.constraints ? Object.values(error.constraints).join(', ') : ''
-      );
-      return new BadRequestException(messages);
-    },
-  }),
-);
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      exceptionFactory: (errors) => {
+        const messages = errors.map((error) =>
+          error.constraints ? Object.values(error.constraints).join(', ') : ''
+        );
+        return new BadRequestException(messages);
+      },
+    }),
+  );
 
   app.setGlobalPrefix(globalPrefix);
 
@@ -66,6 +66,7 @@ async function bootstrap() {
         'http://localhost:5173',
         'https://www.drogueriane.site',
         'https://drogueriane.site',
+        'https://app112.proyectos.fireploy.online'
       ];
 
       const regex = /^https:\/\/farmacia-[a-zA-Z0-9]+-project\.vercel\.app$/;
