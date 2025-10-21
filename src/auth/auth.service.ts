@@ -12,10 +12,10 @@ import { ForgotPasswordDto } from 'src/users/dto/forgot-password.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from '@nestjs-modules/mailer';
-import { transporter } from 'src/config/mailer';
 import { Status } from 'src/users/dto/create-user.dto';
 import { FastifyReply } from 'fastify';
 import * as bcrypt from 'bcrypt';
+import { SendGridService } from 'src/sendgrid/sendgrid.service';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +23,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private mailerService: MailerService,
+    private sendGridService: SendGridService,
   ) { }
 
   async login(loginUserDto: LoginUserDto, response: FastifyReply) {
@@ -249,17 +250,13 @@ export class AuthService {
       });
       */
 
-      transporter.sendMail({
-        from: process.env.MAIL_USER,
-        to: user.email,
-        subject: 'Restablece tu contraseña',
-        template: 'forgot-password',
-        context: {
-          name: user.name,
+      await this.sendGridService.sendMail(
+        email,
+        'd-e431b80efc044dbfb8b429b1d06b8111',
+        { name: user.name,
           reset_link: `${frontendUrl}/reset-password?token=${token}`,
-        },
-      } as any);
-
+        }
+      )// Reemplaza con tu Template ID de SendGrid)
 
       return {
         message: 'Email sent successfully',
