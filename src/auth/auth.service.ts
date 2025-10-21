@@ -12,6 +12,7 @@ import { ForgotPasswordDto } from 'src/users/dto/forgot-password.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from '@nestjs-modules/mailer';
+import { transporter } from 'src/config/mailer';
 import { Status } from 'src/users/dto/create-user.dto';
 import { FastifyReply } from 'fastify';
 import * as bcrypt from 'bcrypt';
@@ -22,7 +23,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private mailerService: MailerService,
-  ) {}
+  ) { }
 
   async login(loginUserDto: LoginUserDto, response: FastifyReply) {
     try {
@@ -100,55 +101,55 @@ export class AuthService {
         );
       }
 
-        const birthDate = new Date(birthdate);
-        const today = new Date();
+      const birthDate = new Date(birthdate);
+      const today = new Date();
 
-        if (birthDate > today) {
-            throw new BadRequestException('La fecha de nacimiento no puede ser en el futuro');
-        }
+      if (birthDate > today) {
+        throw new BadRequestException('La fecha de nacimiento no puede ser en el futuro');
+      }
 
-        const age = today.getFullYear() - birthDate.getFullYear();
-        const hasBirthdayPassed =
-            today.getMonth() > birthDate.getMonth() ||
-            (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const hasBirthdayPassed =
+        today.getMonth() > birthDate.getMonth() ||
+        (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
 
-        const actualAge = hasBirthdayPassed ? age : age - 1;
+      const actualAge = hasBirthdayPassed ? age : age - 1;
 
-        if (actualAge < 18) {
-            throw new BadRequestException('El usuario debe tener al menos 18 años');
-        }
+      if (actualAge < 18) {
+        throw new BadRequestException('El usuario debe tener al menos 18 años');
+      }
 
 
-        await this.usersService.create({
-            id: id,
-            documentType: documentType,
+      await this.usersService.create({
+        id: id,
+        documentType: documentType,
+        name: name,
+        phone: phone,
+        email: email,
+        birthdate: new Date(birthdate),
+        isAdmin: isAdmin,
+        isEmployee: isEmployee,
+      });
+
+      const token = this.jwtService.sign(payload, { expiresIn: '1h' });
+
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+      try {
+        await this.mailerService.sendMail({
+          to: email,
+          subject: 'Establece tu contraseña',
+          template: 'set-password',
+          context: {
             name: name,
-            phone: phone,
-            email: email,
-            birthdate: new Date(birthdate),
-            isAdmin: isAdmin,
-            isEmployee: isEmployee,
+            reset_link: `${frontendUrl}/reset-password?token=${token}`,
+          },
         });
-
-        const token = this.jwtService.sign(payload, { expiresIn: '1h' });
-
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-
-        try {
-            await this.mailerService.sendMail({
-            to: email,
-            subject: 'Establece tu contraseña',
-            template: 'set-password',
-            context: {
-                name: name,
-                reset_link: `${frontendUrl}/reset-password?token=${token}`,
-            },
-            });
-        } catch (error) {
-            throw new BadRequestException(
-            'Error al enviar el correo de verificación',
-            );
-        }
+      } catch (error) {
+        throw new BadRequestException(
+          'Error al enviar el correo de verificación',
+        );
+      }
 
       return {
         message: 'Usuario registrado exitosamente',
@@ -236,6 +237,7 @@ export class AuthService {
 
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
+      /*
       this.mailerService.sendMail({
         to: email,
         subject: 'Restablece tu contraseña',
@@ -245,6 +247,19 @@ export class AuthService {
           reset_link: `${frontendUrl}/reset-password?token=${token}`,
         },
       });
+      */
+
+      transporter.sendMail({
+        from: process.env.MAIL_USER,
+        to: user.email,
+        subject: 'Restablece tu contraseña',
+        template: 'forgot-password',
+        context: {
+          name: user.name,
+          reset_link: `${frontendUrl}/reset-password?token=${token}`,
+        },
+      } as any);
+
 
       return {
         message: 'Email sent successfully',
@@ -330,5 +345,5 @@ export class AuthService {
     }
   }
 
-  
+
 }
