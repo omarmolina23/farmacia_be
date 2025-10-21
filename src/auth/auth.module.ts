@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { SendGridModule } from 'src/sendgrid/sendgrid.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
       }),
       inject: [ConfigService],
     }),
+    SendGridModule
   ],
   controllers: [AuthController],
   providers: [AuthService]
