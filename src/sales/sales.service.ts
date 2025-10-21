@@ -13,6 +13,7 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { getStartEndOfDayInColombia } from 'src/utils/date';
+import { SendGridService } from 'src/sendgrid/sendgrid.service';
 
 @Injectable()
 export class SalesService {
@@ -21,6 +22,7 @@ export class SalesService {
     private invoiceService: InvoiceService,
     private mailerService: MailerService,
     private cloudinaryService: CloudinaryService,
+    private sendGridService: SendGridService,
   ) {}
 
   async create(createSaleDto: CreateSaleDto) {
@@ -178,7 +180,9 @@ export class SalesService {
         detailedProducts: detailedProducts,
       });
 
+      const pdfBase = pdf_sale.toString('base64');
       // Enviar correo al primer cliente (asumiendo uno por venta)
+      /*
       await this.mailerService.sendMail({
         to: clientFound[0].email,
         subject: `Factura de tu compra - Venta #${saleFinal.id}`,
@@ -193,6 +197,24 @@ export class SalesService {
           },
         ],
       });
+      */
+
+      await this.sendGridService.sendMailWithAttachment(
+        clientFound[0].email,
+        "d-60d2520fa03c47558a490847aebb565d",
+        {
+          clientName: clientFound[0].name,
+          saleId: saleFinal.id,
+        },
+        [
+          {
+            content: pdf_sale,
+            filename: `factura-${saleFinal.id}.pdf`,
+            type: 'application/pdf',
+          },
+        ],
+      );
+        
 
       return {
         ...saleFinal,

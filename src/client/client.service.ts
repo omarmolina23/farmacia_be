@@ -8,12 +8,14 @@ import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { randomInt } from 'crypto';
+import { SendGridService } from 'src/sendgrid/sendgrid.service';
 
 @Injectable()
 export class ClientService {
   constructor(
     private prisma: PrismaService,
     private readonly mailerService: MailerService,
+    private sendGridService: SendGridService,
   ) {}
 
   private validateId(id: string) {
@@ -88,6 +90,7 @@ export class ClientService {
     const code = randomInt(100000, 999999).toString();
     this.codes.set(email, code); 
 
+    /*
     try {
       await this.mailerService.sendMail({
         to: email,
@@ -97,6 +100,20 @@ export class ClientService {
           code: code,
         },
       });
+    } catch (error) {
+      throw new BadRequestException('Error al enviar el correo');
+    }
+    */
+
+    try{
+      await this.sendGridService.sendMail(
+        email,
+        'd-fc87f25dbd4746b08b9764efef4b7f98', // Reemplaza con tu Template ID de SendGrid
+        {
+          code: code,
+          subject: 'Tu código de verificación'
+        }
+      );
     } catch (error) {
       throw new BadRequestException('Error al enviar el correo');
     }
