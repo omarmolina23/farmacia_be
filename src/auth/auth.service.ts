@@ -137,6 +137,7 @@ export class AuthService {
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
       try {
+        /*
         await this.mailerService.sendMail({
           to: email,
           subject: 'Establece tu contraseña',
@@ -146,6 +147,16 @@ export class AuthService {
             reset_link: `${frontendUrl}/reset-password?token=${token}`,
           },
         });
+        */
+
+        await this.sendGridService.sendMail(
+          email,
+          'd-4bba4622fe144a829ac8ac0af927f17d', // Reemplaza con tu Template ID de SendGrid
+          {
+            name: name,
+            reset_link: `${frontendUrl}/reset-password?token=${token}`,
+          },
+        );
       } catch (error) {
         throw new BadRequestException(
           'Error al enviar el correo de verificación',
@@ -238,25 +249,23 @@ export class AuthService {
 
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-      /*
-      this.mailerService.sendMail({
-        to: email,
-        subject: 'Restablece tu contraseña',
-        template: 'forgot-password',
-        context: {
-          name: user.name,
-          reset_link: `${frontendUrl}/reset-password?token=${token}`,
-        },
-      });
-      */
+      try {
+        this.sendGridService.sendMail(
+          email,
+          'd-e431b80efc044dbfb8b429b1d06b8111',
+          {
+            name: user.name,
+            reset_link: `${frontendUrl}/reset-password?token=${token}`,
+            subject: 'Restablece tu contraseña'
+          },
+        )
+      } catch (error) {
+        throw new BadRequestException(
+          'Error al enviar el correo de restablecimiento',
+        );
+      }
 
-      await this.sendGridService.sendMail(
-        email,
-        'd-e431b80efc044dbfb8b429b1d06b8111',
-        { name: user.name,
-          reset_link: `${frontendUrl}/reset-password?token=${token}`,
-        }
-      )// Reemplaza con tu Template ID de SendGrid)
+      
 
       return {
         message: 'Email sent successfully',

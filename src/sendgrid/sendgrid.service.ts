@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as sgMail from '@sendgrid/mail';
+import { Subject } from 'rxjs';
 
 @Injectable()
 export class SendGridService {
@@ -22,9 +23,7 @@ export class SendGridService {
   }
 
   async sendMail(
-    to: string,
-    templateId: string,
-    dynamicTemplateData: Record<string, any>,
+    to: string, templateId: string, dynamicTemplateData: Record<string, any>,
   ) {
     const msg = {
       to,
@@ -34,11 +33,39 @@ export class SendGridService {
     };
     try {
       await sgMail.send(msg);
-      console.log(`Correo enviado a ${to} usando template ${templateId}`);
     } catch (error) {
-      console.error('Error enviando correo con SendGrid:', error);
       if (error.response) console.error(error.response.body);
       throw error;
     }
   }
+
+  async sendMailWithAttachment(
+    to: string, templateId: string, dynamicTemplateData: Record<string, any>,
+    attachments: { content: Buffer | string; filename: string; type: string }[]
+
+  ) {
+
+    const sgAttachments = attachments.map(att => ({
+      content: typeof att.content === 'string' ? att.content : att.content.toString('base64'),
+      filename: att.filename,
+      type: att.type,
+      disposition: 'attachment',
+    }));
+
+    const msg = {
+      to,
+      from: this.fromEmail,
+      templateId,
+      dynamicTemplateData,
+      attachments: sgAttachments,
+    };
+    try {
+      await sgMail.send(msg);
+    } catch (error) {
+      if (error.response) console.error(error.response.body);
+      throw error;
+    }
+  }
+
+
 }
