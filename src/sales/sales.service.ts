@@ -201,7 +201,7 @@ export class SalesService {
 
       await this.sendGridService.sendMailWithAttachment(
         clientFound[0].email,
-        "d-60d2520fa03c47558a490847aebb565d",
+        'd-60d2520fa03c47558a490847aebb565d',
         {
           clientName: clientFound[0].name,
           saleId: saleFinal.id,
@@ -214,7 +214,6 @@ export class SalesService {
           },
         ],
       );
-        
 
       return {
         ...saleFinal,
@@ -319,7 +318,7 @@ export class SalesService {
         })),
       });
 
-      await this.mailerService.sendMail({
+      /*await this.mailerService.sendMail({
         to: sale.client.email,
         subject: `Factura de tu compra - Venta #${updatedSale.id}`,
         html: `<p>Hola ${sale.client.name},</p>
@@ -332,7 +331,23 @@ export class SalesService {
             contentType: 'application/pdf',
           },
         ],
-      });
+      });*/
+
+      await this.sendGridService.sendMailWithAttachment(
+        sale.client.email,
+        'd-60d2520fa03c47558a490847aebb565d',
+        {
+          clientName: sale.client.name,
+          saleId: updatedSale.id,
+        },
+        [
+          {
+            content: pdf_sale.toString('base64'),
+            filename: `factura-${updatedSale.id}.pdf`,
+            type: 'application/pdf',
+          },
+        ],
+      );
 
       return updatedSale;
     } catch (error) {
