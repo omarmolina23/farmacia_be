@@ -66,6 +66,7 @@ async function bootstrap() {
         'http://localhost:5173',
         'https://www.drogueriane.site',
         'https://drogueriane.site',
+        'https://drogueria.saimers.dev',
         'https://app112.proyectos.fireploy.online'
       ];
 
