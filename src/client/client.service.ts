@@ -8,14 +8,14 @@ import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { randomInt } from 'crypto';
-import { SendGridService } from 'src/sendgrid/sendgrid.service';
+import { BrevoService } from 'src/brevo/brevo.service';
 
 @Injectable()
 export class ClientService {
   constructor(
     private prisma: PrismaService,
     private readonly mailerService: MailerService,
-    private sendGridService: SendGridService,
+    private brevoService: BrevoService,
   ) {}
 
   private validateId(id: string) {
@@ -106,12 +106,11 @@ export class ClientService {
     */
 
     try{
-      await this.sendGridService.sendMail(
+      await this.brevoService.sendMail(
         email,
-        'd-fc87f25dbd4746b08b9764efef4b7f98', // Reemplaza con tu Template ID de SendGrid
+        3, // Reemplaza con el Template ID de Brevo (verification-code)
         {
           code: code,
-          subject: 'Tu código de verificación'
         }
       );
     } catch (error) {
