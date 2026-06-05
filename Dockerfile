@@ -33,7 +33,7 @@ RUN npm ci
 
 COPY . .
 
-RUN npx nest build --builder tsc && ls dist/main.js
+RUN npx nest build --builder tsc && ls dist/src/main.js
 
 RUN npx prisma generate
 
@@ -41,4 +41,4 @@ RUN npm prune --omit=dev
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main"]
