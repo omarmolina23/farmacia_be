@@ -4,10 +4,10 @@ import { SalesService } from './sales.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { SalesController } from './sales.controller';
 import { InvoiceModule } from 'src/invoice/invoice.module';
-import { SendGridModule } from 'src/sendgrid/sendgrid.module';
+import { BrevoModule } from 'src/brevo/brevo.module';
 
 @Module({
-    imports: [InvoiceModule, SendGridModule], // Importa el módulo de Invoice
+    imports: [InvoiceModule, BrevoModule],
     providers: [ScanGateway, SalesService, CloudinaryService],
     controllers: [SalesController],
 })
