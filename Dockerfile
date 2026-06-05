@@ -33,7 +33,7 @@ RUN npm ci
 
 COPY . .
 
-RUN npx nest build && ls dist/main.js
+RUN npx nest build --builder tsc && ls dist/main.js
 
 RUN npx prisma generate
 
