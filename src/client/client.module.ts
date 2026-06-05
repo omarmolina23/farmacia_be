@@ -2,10 +2,10 @@ import { Module } from "@nestjs/common";
 import { ClientService } from "./client.service";
 import { PrismaModule } from "prisma/prisma.module";
 import { ClientController } from "./client.controller";
-import { BrevoModule } from "src/brevo/brevo.module";
+import { SendGridModule } from "src/sendgrid/sendgrid.module";
 
 @Module({
-    imports: [PrismaModule, BrevoModule],
+    imports: [PrismaModule, SendGridModule],
     controllers: [ClientController],
     providers: [ClientService],
     exports: [ClientService]

@@ -15,7 +15,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Status } from 'src/users/dto/create-user.dto';
 import { FastifyReply } from 'fastify';
 import * as bcrypt from 'bcrypt';
-import { BrevoService } from 'src/brevo/brevo.service';
+import { SendGridService } from 'src/sendgrid/sendgrid.service';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +23,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private mailerService: MailerService,
-    private brevoService: BrevoService,
+    private sendGridService: SendGridService,
   ) { }
 
   async login(loginUserDto: LoginUserDto, response: FastifyReply) {
@@ -149,9 +149,9 @@ export class AuthService {
         });
         */
 
-        await this.brevoService.sendMail(
+        await this.sendGridService.sendMail(
           email,
-          1, // Reemplaza con el Template ID de Brevo (set-password)
+          'd-4bba4622fe144a829ac8ac0af927f17d', // Reemplaza con tu Template ID de SendGrid
           {
             name: name,
             reset_link: `${frontendUrl}/reset-password?token=${token}`,
@@ -250,14 +250,15 @@ export class AuthService {
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
       try {
-        await this.brevoService.sendMail(
+        this.sendGridService.sendMail(
           email,
-          2, // Reemplaza con el Template ID de Brevo (forgot-password)
+          'd-e431b80efc044dbfb8b429b1d06b8111',
           {
             name: user.name,
             reset_link: `${frontendUrl}/reset-password?token=${token}`,
+            subject: 'Restablece tu contraseña'
           },
-        );
+        )
       } catch (error) {
         throw new BadRequestException(
           'Error al enviar el correo de restablecimiento',
