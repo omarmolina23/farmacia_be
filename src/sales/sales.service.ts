@@ -13,7 +13,7 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { getStartEndOfDayInColombia } from 'src/utils/date';
-import { BrevoService } from 'src/brevo/brevo.service';
+import { SendGridService } from 'src/sendgrid/sendgrid.service';
 
 @Injectable()
 export class SalesService {
@@ -22,7 +22,7 @@ export class SalesService {
     private invoiceService: InvoiceService,
     private mailerService: MailerService,
     private cloudinaryService: CloudinaryService,
-    private brevoService: BrevoService,
+    private sendGridService: SendGridService,
   ) {}
 
   async create(createSaleDto: CreateSaleDto) {
@@ -199,9 +199,9 @@ export class SalesService {
       });
       */
 
-      await this.brevoService.sendMailWithAttachment(
+      await this.sendGridService.sendMailWithAttachment(
         clientFound[0].email,
-        4, // Reemplaza con el Template ID de Brevo (invoice-email)
+        'd-60d2520fa03c47558a490847aebb565d',
         {
           clientName: clientFound[0].name,
           saleId: saleFinal.id,
@@ -333,9 +333,9 @@ export class SalesService {
         ],
       });*/
 
-      await this.brevoService.sendMailWithAttachment(
+      await this.sendGridService.sendMailWithAttachment(
         sale.client.email,
-        4, // Reemplaza con el Template ID de Brevo (invoice-email)
+        'd-60d2520fa03c47558a490847aebb565d',
         {
           clientName: sale.client.name,
           saleId: updatedSale.id,

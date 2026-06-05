@@ -7,7 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { BrevoModule } from 'src/brevo/brevo.module';
+import { SendGridModule } from 'src/sendgrid/sendgrid.module';
 
 @Module({
   imports: [
@@ -47,7 +47,7 @@ import { BrevoModule } from 'src/brevo/brevo.module';
       }),
       inject: [ConfigService],
     }),
-    BrevoModule
+    SendGridModule
   ],
   controllers: [AuthController],
   providers: [AuthService]
