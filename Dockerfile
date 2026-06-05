@@ -1,17 +1,3 @@
-FROM node:20-slim AS builder
-
-WORKDIR /app
-
-COPY package*.json ./
-COPY prisma ./prisma/
-
-RUN npm ci
-
-COPY . .
-
-RUN npm run build
-
-
 FROM node:20-slim
 
 WORKDIR /app
@@ -43,9 +29,15 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm ci --omit=dev && npx prisma generate
+RUN npm ci
 
-COPY --from=builder /app/dist ./dist
+COPY . .
+
+RUN npx nest build && ls dist/main.js
+
+RUN npx prisma generate
+
+RUN npm prune --omit=dev
 
 EXPOSE 3000
 
