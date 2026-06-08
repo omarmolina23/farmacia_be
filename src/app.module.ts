@@ -12,9 +12,10 @@ import { SalesModule } from './sales/sales.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { TwilioModule } from './twilio/twilio.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, CategoryModule, SupplierModule, ProductsModule, BatchModule, TagModule, ClientModule, SalesModule, CloudinaryModule, ScheduleModule.forRoot(), DashboardModule, TwilioModule],
+  imports: [AuthModule, UsersModule, CategoryModule, SupplierModule, ProductsModule, BatchModule, TagModule, ClientModule, SalesModule, CloudinaryModule, ScheduleModule.forRoot(), DashboardModule, TwilioModule, AiModule],
   controllers: [],
   providers: [],
 })

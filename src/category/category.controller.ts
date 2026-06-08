@@ -32,6 +32,11 @@ export class CategoryController {
     return this.categoryService.findAll();
   }
 
+  @Get('names')
+  findAllNames() {
+    return this.categoryService.findAllNames();
+  }
+
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @Get('search')

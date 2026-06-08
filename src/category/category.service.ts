@@ -34,6 +34,15 @@ export class CategoryService {
     return await this.prisma.category.findMany();
   }
 
+  // Consulta liviana (id + name + status) para poblar selectores/desplegables
+  // sin traer el resto de campos de la categoría.
+  async findAllNames() {
+    return await this.prisma.category.findMany({
+      select: { id: true, name: true, status: true },
+      orderBy: { name: 'asc' },
+    });
+  }
+
   async findByName(query?: string) {
     const category = await this.prisma.category.findMany({
       where: {

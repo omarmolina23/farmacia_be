@@ -66,6 +66,8 @@ async function bootstrap() {
         'http://localhost:5173',
         'https://www.drogueriane.site',
         'https://drogueriane.site',
+        'https://www.drogueriane.store',
+        'https://drogueriane.store',
         'https://drogueria.saimers.dev',
         'https://app112.proyectos.fireploy.online'
       ];
@@ -75,7 +77,7 @@ async function bootstrap() {
       if (!origin || allowedOrigins.includes(origin) || regex.test(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('No permitido por CORS'), false);
+        callback(null, false);
       }
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
