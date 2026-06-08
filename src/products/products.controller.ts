@@ -125,6 +125,11 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
+  @Get('names')
+  findAllNames() {
+    return this.productsService.findAllNames();
+  }
+
   @Get('for-sale')
   findAllForSale() {
     return this.productsService.findAllForSale();

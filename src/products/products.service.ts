@@ -173,6 +173,15 @@ export class ProductsService {
     });
   }
 
+  // Consulta liviana (solo id + name) para poblar selectores/desplegables
+  // sin descargar relaciones (categoría, proveedor, tags, imágenes).
+  async findAllNames() {
+    return await this.prisma.product.findMany({
+      select: { id: true, name: true },
+      orderBy: { name: 'asc' },
+    });
+  }
+
   async findAllForSale() {
     const products = await this.prisma.product.findMany({
       select: {
