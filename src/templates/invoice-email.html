@@ -87,7 +87,7 @@
     <header
       style="display: flex; align-items: center; gap: 20px; margin-bottom: 30px"
     >
-      <h1 style="color: #2e7d32; margin: 0">Factura de venta</h1>
+      <h1 style="color: #2e7d32; margin: 0">{{documentTitle}}</h1>
       <img
         src="https://res.cloudinary.com/dcvikbhm6/image/upload/v1742098103/dzuvp1n5jnssnspkxs4t.png"
         class="logo"
@@ -109,9 +109,15 @@
 
       <div class="invoice-info">
         <strong>Fecha:</strong> {{date}}<br />
+        {{#isCreditNote}}
+        <strong>Nota de Crédito No: </strong>{{creditNoteNumber}}<br />
+        <strong>Factura de venta referenciada: </strong>{{invoiceENumber}}<br />
+        {{/isCreditNote}}
+        {{^isCreditNote}}
         <strong>N.º Factura:</strong> {{invoiceNumber}}<br />
         <strong>Factura Electrónica de Venta No: </strong
         >{{invoiceENumber}}<br />
+        {{/isCreditNote}}
         <strong>{{cufeLabel}}: </strong><span class="long-text">{{cufe}}</span><br />
       </div>
     </div>
@@ -143,7 +149,7 @@
 
     <div style="margin-top: 30px; text-align: center">
       {{#qrImage}}
-      <p>Escanee el código QR para ver la factura electrónica:</p>
+      <p>Escanee el código QR para ver {{#isCreditNote}}la nota de crédito{{/isCreditNote}}{{^isCreditNote}}la factura electrónica{{/isCreditNote}}:</p>
       <img src="{{qrImage}}" alt="Código QR" style="max-width: 150px" />
       {{/qrImage}} {{^qrImage}}
       <p><strong>El código QR no está disponible.</strong></p>
@@ -151,7 +157,12 @@
     </div>
 
     <div class="footer">
+      {{#isCreditNote}}
+      <p>Devolución procesada. Gracias por tu preferencia ❤️.</p>
+      {{/isCreditNote}}
+      {{^isCreditNote}}
       <p>Gracias por su compra ❤️.</p>
+      {{/isCreditNote}}
       Barrio Nueva Esperanza Av. 19<br />
       Tel: +57 3115883433
     </div>

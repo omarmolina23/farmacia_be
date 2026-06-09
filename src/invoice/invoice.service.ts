@@ -12,8 +12,14 @@ export class InvoiceService {
         // 1. Cargar la plantilla
         const template = await fs.readFile(templatePath, 'utf-8');
 
+        // ¿Es una nota de crédito (devolución)? Se puede indicar explícitamente
+        // con isCreditNote o, si no, se infiere de que la venta esté devuelta.
+        const isCreditNote = invoiceData.isCreditNote ?? invoiceData.sale.repaid ?? false;
+
         // 3. Renderizar HTML
         const html = mustache.render(template, {
+            isCreditNote,
+            documentTitle: isCreditNote ? 'Nota de Crédito' : 'Factura de venta',
             clientName: invoiceData.clientFound[0].name.toUpperCase(),
             clientId: invoiceData.clientFound[0].id,
             clientEmail: invoiceData.clientFound[0].email,
@@ -29,8 +35,9 @@ export class InvoiceService {
             }),
             invoiceNumber: invoiceData.sale.id || 'No disponible',
             invoiceENumber: invoiceData.sale.number_e_invoice || 'No disponible',
+            creditNoteNumber: invoiceData.sale.number_credit_note || 'No disponible',
             cufe: invoiceData.sale.cufe || 'No disponible',
-            cufeLabel: invoiceData.sale.repaid ? 'CUDE' : 'CUFE',
+            cufeLabel: isCreditNote ? 'CUDE' : 'CUFE',
             qrImage: invoiceData.sale.qr_image || '',
             items: invoiceData.detailedProducts,
             total: invoiceData.sale.total.toFixed(2),

@@ -335,15 +335,80 @@ export class SalesService {
 
       await this.brevoService.sendMailWithAttachment(
         sale.client.email,
-        4, // Reemplaza con el Template ID de Brevo (invoice-email)
+        4, // Template de Brevo (invoice-email); el cuerpo se ramifica con isCreditNote
         {
           clientName: sale.client.name,
           saleId: updatedSale.id,
+          isCreditNote: false,
         },
         [
           {
             content: pdf_sale.toString('base64'),
             filename: `factura-${updatedSale.id}.pdf`,
+            type: 'application/pdf',
+          },
+        ],
+      );
+
+      return updatedSale;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async generateCreditNote(id: string, updateSaleDto: UpdateSaleDto) {
+    try {
+      const { number_credit_note, cufe, qr_image } = updateSaleDto;
+      const sale = await this.findById(id);
+
+      if (!sale) {
+        throw new NotFoundException('Venta no encontrada');
+      }
+
+      const updatedSale = await this.prisma.sale.update({
+        where: { id },
+        data: {
+          number_credit_note,
+          cufe,
+          qr_image,
+        },
+        include: this.saleInclude,
+      });
+
+      // Generamos el PDF como NOTA DE CRÉDITO de forma explícita. La venta aún
+      // no está marcada como devuelta en este punto (eso ocurre en returnSale),
+      // por eso pasamos isCreditNote en vez de depender de sale.repaid.
+      const pdf_creditNote = await this.invoiceService.generateInvoicePdf({
+        isCreditNote: true,
+        sale: updatedSale,
+        clientFound: [
+          {
+            id: sale.client.id,
+            name: sale.client.name,
+            email: sale.client.email,
+          },
+        ],
+        detailedProducts: sale.products.map((product) => ({
+          name: product.products.name,
+          quantity: product.amount,
+          unitPrice: Number(product.products.price),
+          subtotal: product.amount * Number(product.products.price),
+        })),
+      });
+
+      await this.brevoService.sendMailWithAttachment(
+        sale.client.email,
+        4, // Mismo template de Brevo que la factura; el cuerpo se ramifica con isCreditNote
+        {
+          clientName: sale.client.name,
+          saleId: updatedSale.id,
+          creditNoteNumber: updatedSale.number_credit_note,
+          isCreditNote: true,
+        },
+        [
+          {
+            content: pdf_creditNote.toString('base64'),
+            filename: `nota-credito-${updatedSale.id}.pdf`,
             type: 'application/pdf',
           },
         ],

@@ -47,6 +47,15 @@ export class SalesController {
     ) {
         return this.salesService.generateEInvoice(id, updateSaleDto);
     }
+
+    @UseGuards(AuthGuard)
+    @Patch('credit-note/:id')
+    async generateCreditNote(
+        @Param('id') id: string,
+        @Body() updateSaleDto: UpdateSaleDto
+    ) {
+        return this.salesService.generateCreditNote(id, updateSaleDto);
+    }
     
     @Get('user/:userId')
     async findByUserId(@Param('userId') userId: string) {
