@@ -9,7 +9,7 @@ import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
     cors: {
-        origin: ['http://localhost:5173', 'https://www.drogueriane.site', 'https://drogueriane.site', 'https://app112.proyectos.fireploy.online'],
+        origin: ['http://localhost:5173', 'https://www.drogueriane.site', 'https://drogueriane.site', 'https://www.drogueriane.store', 'https://drogueriane.store', 'https://app112.proyectos.fireploy.online'],
         methods: ['GET', 'POST'],
     }
 })
