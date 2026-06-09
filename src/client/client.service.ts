@@ -88,7 +88,12 @@ export class ClientService {
     }
 
     const code = randomInt(100000, 999999).toString();
-    this.codes.set(email, code); 
+    this.codes.set(email, code);
+
+    // Buscamos el cliente por correo para personalizar el saludo del correo.
+    // Si no existe (p. ej. aún no registrado), usamos un saludo genérico.
+    const client = await this.prisma.client.findFirst({ where: { email } });
+    const name = client?.name ?? 'cliente';
 
     /*
     try {
@@ -111,6 +116,7 @@ export class ClientService {
         3, // Reemplaza con el Template ID de Brevo (verification-code)
         {
           code: code,
+          name: name,
         }
       );
     } catch (error) {
