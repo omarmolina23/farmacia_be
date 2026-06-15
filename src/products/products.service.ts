@@ -358,6 +358,94 @@ export class ProductsService {
     }
   }
 
+  // Versión por lote de getWeeklySalesLast6Months: calcula las ventas
+  // semanales (24 semanas) de TODOS los productos con UNA sola consulta a la
+  // base de datos, en vez de una consulta por producto. El forecasting la usa
+  // para evitar el patrón N+1 (~2000 peticiones → 1).
+  async getWeeklySalesLast6MonthsAllProducts() {
+    try {
+      const now = new Date();
+      const colombiaNow = new Date(
+        now.toLocaleString('en-US', { timeZone: 'America/Bogota' }),
+      );
+      const { start: todayStart } = getStartEndOfDayInColombia(colombiaNow);
+      const sixMonthsAgo = startOfWeek(subWeeks(todayStart, 24), {
+        weekStartsOn: 1,
+      });
+
+      // Una sola consulta con TODAS las ventas no reembolsadas de los últimos
+      // 6 meses (campos mínimos), para todos los productos a la vez.
+      const sales = await this.prisma.saleProductClient.findMany({
+        where: {
+          venta: {
+            date: {
+              gte: sixMonthsAgo,
+            },
+            repaid: false,
+          },
+        },
+        select: {
+          productId: true,
+          amount: true,
+          venta: {
+            select: {
+              date: true,
+            },
+          },
+        },
+      });
+
+      // Agrupar en memoria: productId → (semana → totalVentas)
+      const salesByProduct = new Map<string, Map<string, number>>();
+      for (const sale of sales) {
+        const saleDate = new Date(sale.venta.date);
+        const start = startOfWeek(saleDate, { weekStartsOn: 1 });
+        const weekKey = start.toISOString().split('T')[0];
+
+        let weeks = salesByProduct.get(sale.productId);
+        if (!weeks) {
+          weeks = new Map<string, number>();
+          salesByProduct.set(sale.productId, weeks);
+        }
+        weeks.set(weekKey, (weeks.get(weekKey) || 0) + sale.amount);
+      }
+
+      // Definición de las 24 semanas (idéntica a getWeeklySalesLast6Months,
+      // incluido el desfase prevWeekKey, para no cambiar el resultado).
+      const currentWeekStart = startOfWeek(todayStart, { weekStartsOn: 1 });
+      const weekDefs: { label: string; prevWeekKey: string }[] = [];
+      for (let i = 23; i >= 0; i--) {
+        const currentWeek = new Date(
+          currentWeekStart.getTime() - i * 7 * 24 * 60 * 60 * 1000,
+        );
+        const previousWeek = new Date(
+          currentWeek.getTime() - 7 * 24 * 60 * 60 * 1000,
+        );
+        const prevWeekKey = startOfWeek(previousWeek, { weekStartsOn: 1 })
+          .toISOString()
+          .split('T')[0];
+        const label = currentWeek.toISOString().split('T')[0];
+        weekDefs.push({ label, prevWeekKey });
+      }
+
+      // Construir la serie de 24 semanas solo para los productos que tuvieron
+      // ventas (el resto el forecasting los descarta de todos modos).
+      const result: Record<string, { week: string; totalSales: number }[]> = {};
+      for (const [productId, weeks] of salesByProduct) {
+        result[productId] = weekDefs.map(({ label, prevWeekKey }) => ({
+          week: label,
+          totalSales: weeks.get(prevWeekKey) || 0,
+        }));
+      }
+
+      return result;
+    } catch (error) {
+      throw new BadRequestException(
+        'Error al obtener las ventas semanales por lote',
+      );
+    }
+  }
+
   async getProductStockSummary() {
     try {
       const products = await this.prisma.product.findMany({

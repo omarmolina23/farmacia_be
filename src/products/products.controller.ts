@@ -168,6 +168,14 @@ export class ProductsController {
     return this.productsService.findByNameOnly(query);
   }
 
+  // Devuelve las ventas semanales de TODOS los productos en una sola
+  // respuesta (consumido por el forecasting). Reemplaza el patrón N+1 de
+  // llamar a weekly-sales/:id una vez por producto.
+  @Get('weekly-sales-batch')
+  getWeeklySalesBatch() {
+    return this.productsService.getWeeklySalesLast6MonthsAllProducts();
+  }
+
   @Get('weekly-sales/:id')
   getWeeklySalesByProduct(@Param('id') id: string) {
     return this.productsService.getWeeklySalesLast6Months(id);
